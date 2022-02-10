@@ -52,7 +52,7 @@ def build_ops(Grid):
     # Note this is only true in cartesian coordinates!
     # For more general coordinate systems it is worth
     # assembling G and D seperately.
-    print(D)
+    #print(D)
     G = -(D.T).tolil()
     #G[dof_f_bnd,:] = 0.0
     G = G.tocsr()
@@ -86,7 +86,7 @@ def build_ops(Grid):
     
     #Identity
     I = (sp.eye(Grid.N)).tocsr()#.toarray()
-    print(sp.issparse(D),sp.issparse(G),sp.issparse(I))
+    #print(sp.issparse(D),sp.issparse(G),sp.issparse(I))
 
     return D,G,C,I,M;
 
