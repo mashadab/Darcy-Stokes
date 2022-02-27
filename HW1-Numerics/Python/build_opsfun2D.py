@@ -53,9 +53,11 @@ def build_ops(Grid):
     # For more general coordinate systems it is worth
     # assembling G and D seperately.
     #print(D)
-    G = -(D.T).tolil()
-    #G[dof_f_bnd,:] = 0.0
-    G = G.tocsr()
+    G = -sp.csr_matrix.transpose(D)
+    G =  zero_rows(G,dof_f_bnd)
+
+    #Identity
+    I = (sp.eye(Grid.N)).tocsr()
     
     #Curl matrix 
     C = []
@@ -84,11 +86,15 @@ def build_ops(Grid):
         Avg_x2 = sp.kron(Avg_x1,sp.eye(Grid.Ny))         
         M      = sp.vstack([Avg_x2, Avg_y2])
     
-    #Identity
-    I = (sp.eye(Grid.N)).tocsr()#.toarray()
-    #print(sp.issparse(D),sp.issparse(G),sp.issparse(I))
-
     return D,G,C,I,M;
+
+def zero_rows(M, rows_to_zero):
+
+    ixs = np.ones(M.shape[0], int)
+    ixs[rows_to_zero] = 0
+    D = sp.diags(ixs)
+    res = D * M
+    return res
 
 
 
