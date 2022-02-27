@@ -41,7 +41,7 @@ def comp_mean(K,M,p,Grid,kvkh): # repo MDOT
     
     return Kd;
 
-
+'''
 #Testing 
 
 import sys
@@ -60,3 +60,4 @@ Grid.xmin = 0; Grid.xmax = 1; Grid.Nx = 10;
 Grid = build_grid(Grid);
 [D,G,C,I,M] = build_ops(Grid);
 Kd = comp_mean(K(Grid.xc),M,1,Grid,1);
+'''

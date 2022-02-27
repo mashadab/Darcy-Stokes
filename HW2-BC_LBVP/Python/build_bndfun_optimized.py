@@ -121,13 +121,11 @@ def build_bnd_new(Param,Grid,I):
       
         dummy = Param.qb*Grid.A[Param.dof_f_neu-1,:]/Grid.V[Param.dof_neu-1,:]      
         
-        #find nonunique faces
-       
-        #sum the flux contributions and reduce the size of array
-       
-        #divide by volume 
+        #find nonunique cell's faces
+        unq, ids = np.unique(Param.dof_neu, return_inverse=True) #unq: unique dof, ids: number of times
         
-        fn[np.unique(Param.dof_neu)-1,:] = dummy
+        #sum the flux contributions per cell
+        fn[unq-1,:] = np.bincount(ids, dummy)
         
         fn = sp.csr_matrix(fn)
         
