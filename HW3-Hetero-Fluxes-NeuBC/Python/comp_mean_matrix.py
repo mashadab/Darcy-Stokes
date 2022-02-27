@@ -1,3 +1,9 @@
+# import python libraries
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.sparse as sp
+import scipy.sparse.linalg as linalg
+
 def comp_mean(K,M,p,Grid,kvkh): # repo MDOT 
     # author: Marc Hesse, Afzal Shadab
     # date: 2 Mar 2021, 25 Apr 2021, 9 Feb 2022
@@ -31,16 +37,12 @@ def comp_mean(K,M,p,Grid,kvkh): # repo MDOT
     
     return Kd;
 
-'''
+
+#Testing 
+
 import sys
 sys.path.insert(1, '../../HW1-Numerics/Python/')
 sys.path.insert(1, '../../HW2-BC_LBVP/Python/')
-
-# import python libraries
-import numpy as np
-import matplotlib.pyplot as plt
-import scipy.sparse as sp
-import scipy.sparse.linalg as linalg
 
 # import personal libraries
 from classfun import *
@@ -54,4 +56,3 @@ Grid.xmin = 0; Grid.xmax = 1; Grid.Nx = 10;
 Grid = build_grid(Grid);
 [D,G,C,I,M] = build_ops(Grid);
 Kd = comp_mean(K(Grid.xc),M,1,Grid,1);
-'''
