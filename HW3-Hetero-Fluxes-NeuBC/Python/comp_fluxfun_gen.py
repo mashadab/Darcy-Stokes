@@ -1,7 +1,7 @@
 # import python libraries
 import numpy as np
 
-def comp_flux_ade_gen(flux,res,u,Grid,Param):
+def comp_flux_gen(flux,res,u,Grid,Param):
       # author: Mohammad Afzal Shadab
       # date: 11 February 2021
       # Description:
@@ -32,6 +32,10 @@ def comp_flux_ade_gen(flux,res,u,Grid,Param):
     if not Param.dof_neu.any(): 
         dof_cell = (np.squeeze(Param.dof_dir, axis=0))
         dof_face = (np.squeeze(Param.dof_f_dir, axis=0))
+
+    elif not Param.dof_dir.any(): 
+        dof_cell = Param.dof_neu
+        dof_face = Param.dof_f_neu
     
     #For non-empty Dirichlet and Neumann BC
     else:
@@ -50,9 +54,9 @@ def comp_flux_ade_gen(flux,res,u,Grid,Param):
     #Because of Python indexing
     dof_cell = np.subtract(dof_cell,1)
     dof_face = np.subtract(dof_face,1)
+    
 
     # 3) Compute residuals and convert them to bnd fluxes    
-    resCalc  = res(u)
-    q[dof_face,:] =  np.transpose([sign]) * resCalc[dof_cell,:] *Grid.V[dof_cell,:]/Grid.A[dof_face,:]
+    q[dof_face,:] =  np.transpose([sign]) * res(u,dof_cell) *Grid.V[dof_cell,:]/Grid.A[dof_face,:]
 
     return q;
