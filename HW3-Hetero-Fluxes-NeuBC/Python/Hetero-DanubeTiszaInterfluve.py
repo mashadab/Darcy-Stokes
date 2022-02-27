@@ -48,6 +48,11 @@ h      = solve_lbvp(L, fs + fn, B, BC.g, N)
 
 #Plot results
 plt.figure(figsize=(10,7.5))
+plt.plot(Grid.xc/1e3,K/cm2m)
+plt.xlabel(r'$x$ [km]')
+plt.ylabel(r'$K$ [cm/s]')
+
+plt.figure(figsize=(10,7.5))
 plt.plot(Grid.xc/1e3,h)
 plt.xlabel(r'$x$ [km]')
 plt.ylabel(r'$h$ [m]')
