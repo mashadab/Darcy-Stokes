@@ -52,7 +52,7 @@ phi = 1 + 0.1*np.cos(2*np.pi/HD*zc);
 # Build boundary conditions
 BC.u.dof_dir   = np.array([Grid.dof_xmin[0]])
 BC.u.dof_f_dir = np.array([Grid.dof_f_xmin[0]]) 
-BC.u.g         = np.array([[0]]) 
+BC.u.g         = np.array([[HD]]) 
 BC.u.dof_neu   = np.array([Grid.dof_xmax[0]])
 BC.u.dof_f_neu = np.array([Grid.dof_f_xmax[0]])
 BC.u.qb        = np.array([[0]])
@@ -65,21 +65,24 @@ phi = 1 + 0.1*np.cos(2*np.pi/HD*zc);
 
 #Plotting the solution
 fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4,figsize=(10,7))
-fig.suptitle('Modified Helmholtz problem')
+fig.suptitle('Modified Helmholtz and Poisson problems')
 
-ax1.plot(phi,zc)
+ax1.plot(phi,zc,label='$\phi_D$')
 ax1.set_xlabel(r'$\phi_D$')
 ax1.set_ylabel(r'$z_D$')
 
-ax2.plot(hD,zc)
-ax2.set_xlabel(r'$h_D$')
+ax2.plot(hD,zc,label=r'$h_D$')
+ax2.plot(uD,zc,label=r'$u_D$')
+ax2.set_xlabel(r'$h_D,u_D$')
+ax2.legend(loc='best')
 
 ax3.plot(pD,zc)
 ax3.set_xlabel(r'$p_D$')
 
-ax4.plot(qD,zf)
-ax4.set_xlabel(r'$qD$')
-
+ax4.plot(qD,zf,label=r'$q_D$')
+ax4.plot(vD,zf,label=r'$v_D$')
+ax4.set_xlabel(r'$q_D,v_D$')
+ax4.legend(loc='best')
 plt.tight_layout()
 
 
