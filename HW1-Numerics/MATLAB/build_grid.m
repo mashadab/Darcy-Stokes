@@ -40,6 +40,7 @@ Grid.dx = Grid.Lx/Grid.Nx;        % dx of the gridblocks
 Grid.Nfx = Grid.Nx+1;
 
 Grid.Nf  = Grid.Nfx;
+Grid.N   = Grid.Nx;
 
 % Set up mesh
 % cell centers 'xc' and cell faces 'xf'   
