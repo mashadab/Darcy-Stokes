@@ -4,7 +4,7 @@ m_exp = 1;
 HD = 30;
 
 % build grid and ops
-Grid.xmin = 0; Grid.xmax = HD; Grid.Nx = 35;
+Grid.xmin = 0; Grid.xmax = HD; Grid.Nx = 350;
 Grid = build_grid(Grid);
 [D,G,C,I,M] = build_ops(Grid);
 Gamma = spalloc(Grid.N,1,0);

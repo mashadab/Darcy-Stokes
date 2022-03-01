@@ -19,7 +19,7 @@ function [uD,vD] = solve_Poisson(D,G,I,phi,m,pD,Grid,B,N,fn,BC) % class
 % uD = N  by 1 column vector of dimensionless solid velocity potentials
 % vD = Nf by 1 column vector of dimensionless solid velocities
 
-Phi_m = diag(phi.^m);
+Phi_m = spdiags(phi.^m,0,Grid.N,Grid.N);
 L  = - D * G;       % system matrix
 fs = Phi_m * pD;   % r.h.s.
 flux = @(h) -G * h;
@@ -27,4 +27,5 @@ res = @(h,cell) L(cell,:)*h - fs(cell);
 
 uD = solve_lbvp(L,fs+fn,B,BC.g,N);
 vD = comp_flux_gen(flux,res,uD,Grid,BC);
+
 end

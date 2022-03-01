@@ -55,7 +55,6 @@ def comp_flux_gen(flux,res,u,Grid,Param):
     dof_cell = np.subtract(dof_cell,1)
     dof_face = np.subtract(dof_face,1)
     
-
     # 3) Compute residuals and convert them to bnd fluxes    
     q[dof_face,:] =  np.transpose([sign]) * res(u,dof_cell) *Grid.V[dof_cell,:]/Grid.A[dof_face,:]
 
