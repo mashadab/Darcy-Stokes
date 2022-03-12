@@ -33,15 +33,9 @@ we have the dimensionless solution for the overpressure head hD and the associat
 The dimensionless over pressure is given by pD = hD - zD.
 """
 
-#append library locations
-import sys
-sys.path.insert(1, '../../HW1-Numerics/Python/')
-
 #import library and modules
 import numpy as np
 import matplotlib.pyplot as plt
-from classfun import *
-from build_gridfun2D import build_grid 
 
 ##############################################################################
 #Analytic solutions
