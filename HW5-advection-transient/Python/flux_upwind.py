@@ -1,11 +1,7 @@
-# import python libraries
-import sys
-sys.path.insert(1, '../../HW1-Numerics/Python/')
-
 import numpy as np
 import scipy.sparse as sp
+
 from classfun import *
-from build_gridfun2D import build_grid
 
 #computes the upwind flux using Godunov scheme
 
@@ -86,6 +82,14 @@ def flux_upwind(q,Grid):
 
     return A;
 
+'''
+import sys
+sys.path.insert(1, '../../HW1-Numerics/Python/')
+
+import numpy as np
+import scipy.sparse as sp
+from classfun import *
+from build_gridfun2D import build_grid
 
 Grid.xmin = 0 
 Grid.xmax = 1 
@@ -99,3 +103,4 @@ Grid = build_grid(Grid)
 q = np.ones((Grid.Nf,1))
 A = flux_upwind(q,Grid)
 print(sp.issparse(A))
+'''
