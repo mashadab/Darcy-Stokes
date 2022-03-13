@@ -30,8 +30,12 @@ def comp_flux_gen(flux,res,u,Grid,Param):
     #1) Identify the faces and cells on the boundary
     # note: check if o.k. for homogeneous Neumann problem
     if not Param.dof_neu.any(): 
-        dof_cell = (np.squeeze(Param.dof_dir, axis=0))
-        dof_face = (np.squeeze(Param.dof_f_dir, axis=0))
+        if Grid.Ny == 1:
+            dof_cell = Param.dof_dir
+            dof_face = Param.dof_f_dir
+        else:       
+            dof_cell = (np.squeeze(Param.dof_dir, axis=0))
+            dof_face = (np.squeeze(Param.dof_f_dir, axis=0))
 
     elif not Param.dof_dir.any(): 
         dof_cell = Param.dof_neu
