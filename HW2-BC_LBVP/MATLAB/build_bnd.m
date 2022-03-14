@@ -67,4 +67,4 @@ B = I(BC.dof_dir,:);
 N = I;
 N(:,BC.dof_dir) = [];
 
-fn = spalloc(Grid.Nx,1,0); % empty for now because we don't yet have Neuman BC's
+fn = spalloc(Grid.N,1,0); % empty for now because we don't yet have Neuman BC's

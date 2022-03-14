@@ -1,14 +1,8 @@
-%Solving heat equation - D * G * u = fs in 3D
-%Spherical source term at the center
-%Mohammad Afzal Shadab and Marc Hesse
-%Date: 14 March 2022
-
 set_demo_defaults;
 
-%building grid and operators
-Grid.xmin = 0; Grid.xmax = 3; Grid.Nx = 50;
-Grid.ymin = 0; Grid.ymax = 3; Grid.Ny = 50;
-Grid.zmin = 0; Grid.zmax = 3; Grid.Nz = 50;
+Grid.xmin = 0; Grid.xmax = 3; Grid.Nx = 10;
+Grid.ymin = 0; Grid.ymax = 3; Grid.Ny = 10;
+Grid.zmin = 0; Grid.zmax = 3; Grid.Nz = 10;
 
 Grid = build_grid3D(Grid);
 [D,G,C,I,M] = build_ops3D(Grid);
@@ -30,10 +24,9 @@ Xo=(Grid.xmax - Grid.xmin)/2;Yo=(Grid.ymax - Grid.ymin)/2;Zo=(Grid.zmax - Grid.z
 
 fs((X-Xo).^2 + (Y-Yo).^2 + (Z-Zo).^2 < 0.5) = 1.0;  %spherical source term at center
 
-%solving the linear boundary value problem
 u = solve_lbvp(L,fs+fn,B,BC.g,N);
 
-%plotting
+
 plotting(Grid,X,Y,Z,u)
 
 

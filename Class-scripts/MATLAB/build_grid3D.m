@@ -139,33 +139,12 @@ Grid.dof_f_zmin = dummy(:);
 dummy = Grid.dof_f_z(:,:,Grid.Nz+1);
 Grid.dof_f_zmax = dummy(:);
 
-%{
-%% Boundary dof's
-% Boundary cells
-
-Grid.dof_xmin = []
-
-for i = 1:N
-    if mod(i,Grid.Nx*Grid.Ny)<=Grid.Ny, Grid.dof_xmin = [Grid.dof_xmin,i]; end
-    
-end 
-
-Grid.dof_xmin = [1:Grid.Ny]';
-Grid.dof_xmax = [Grid.N-Grid.Ny+1:Grid.N]';
-Grid.dof_ymin = [1:Grid.Ny:Grid.N-Grid.Ny+1]';
-Grid.dof_ymax = [Grid.Ny:Grid.Ny:Grid.N]';
-
-
-
-
-% Boundary faces
-% note: y-fluxes are shifted by Nfx
-Grid.dof_f_xmin = Grid.dof_xmin;
-Grid.dof_f_xmax = [Grid.Nfx-Grid.Ny+1:Grid.Nfx]';
-Grid.dof_f_ymin = Grid.Nfx+[1:Grid.Ny+1:Grid.Nfy-Grid.Ny]';
-Grid.dof_f_ymax = Grid.Nfx+[Grid.Ny+1:Grid.Ny+1:Grid.Nfy]';
-
-%}
+% Volumes are stored and indexed like unknowns. Areas are stored and indexed like fluxes
+Grid.A = [ones(Grid.Nfx,1)*Grid.dy*Grid.dz;...
+          ones(Grid.Nfy,1)*Grid.dx*Grid.dz;...
+          ones(Grid.Nfz,1)*Grid.dx*Grid.dy;...
+          Grid.dx*Grid.dy*Grid.dz];
+Grid.V  = ones(Grid.N,1)*Grid.dx*Grid.dy*Grid.dz;
 
 
 % In preparation for irregular grid, store all cell volumes and face areas
