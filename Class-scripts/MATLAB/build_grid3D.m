@@ -89,6 +89,55 @@ Grid.N = Grid.Nx*Grid.Ny*Grid.Nz; % total number of gridblocks
 Grid.dof   = [1:Grid.N]';         % cell centered degree of freedom/gridblock number
 Grid.dof_f = [1:Grid.Nf]';        % face degree of freedom/face number
 
+%% Boundary dof's
+% Boundary cells
+
+Grid.dof_xmin = [];
+Grid.dof_xmax = [];
+Grid.dof_ymin = [];
+Grid.dof_ymax = [];
+
+for i = 1:Grid.N
+    if mod(i,Grid.Nx*Grid.Ny)<=Grid.Ny && mod(i,Grid.Nx*Grid.Ny)> 0
+        Grid.dof_xmin = [Grid.dof_xmin;i];
+    end
+    if mod(i - 1,Grid.Nx*Grid.Ny)>=Grid.Nx*Grid.Ny - Grid.Ny
+        Grid.dof_xmax = [Grid.dof_xmax;i];
+    end
+    
+    if mod(i,Grid.Ny)==1
+        Grid.dof_ymin = [Grid.dof_ymin;i];
+    end
+    if mod(i,Grid.Ny)==0
+        Grid.dof_ymax = [Grid.dof_ymax;i];
+    end 
+end 
+
+Grid.dof_zmin =[1:Grid.Ny*Grid.Nx]';
+Grid.dof_zmax =[Grid.N - Grid.Ny*Grid.Nx+1:Grid.N]';
+
+Grid.dof_f_x = Grid.dof_f(1:Grid.Nfx);
+Grid.dof_f_x = reshape(Grid.dof_f_x,Grid.Ny,Grid.Nx+1,Grid.Nz);
+dummy = Grid.dof_f_x(:,1,:);
+Grid.dof_f_xmin = dummy(:);
+dummy = Grid.dof_f_x(:,Grid.Nx+1,:);
+Grid.dof_f_xmax = dummy(:);
+
+Grid.dof_f_y = Grid.dof_f(Grid.Nfx+1:Grid.Nfx+Grid.Nfy);
+Grid.dof_f_y = reshape(Grid.dof_f_y,Grid.Ny+1,Grid.Nx,Grid.Nz);
+dummy = Grid.dof_f_y(1,:,:);
+Grid.dof_f_ymin = dummy(:);
+dummy = Grid.dof_f_y(Grid.Ny+1,:,:);
+Grid.dof_f_ymax = dummy(:);
+
+
+Grid.dof_f_z = Grid.dof_f(Grid.Nf - Grid.Nfz+1:Grid.Nf);
+Grid.dof_f_z = reshape(Grid.dof_f_z,Grid.Ny,Grid.Nx,Grid.Nz+1);
+dummy = Grid.dof_f_z(:,:,1);
+Grid.dof_f_zmin = dummy(:);
+dummy = Grid.dof_f_z(:,:,Grid.Nz+1);
+Grid.dof_f_zmax = dummy(:);
+
 %{
 %% Boundary dof's
 % Boundary cells

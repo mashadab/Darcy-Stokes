@@ -36,7 +36,7 @@ function [Grid] = build_grid3D(Grid) % repo (MDOT)
 % >> Grid.xmin = 0; Grid.xmax = 1; Grid.Nx = 10; 
 % >> Grid = build_grid(Grid);
 
-%% Set up catesian geometry
+%% Set up cartesian geometry
 if ~isfield(Grid,'geom'); Grid.geom = 'cartesian'; end
 if ~isfield(Grid,'periodic'); Grid.periodic = 'none'; end
 if ~isfield(Grid,'xmin'); Grid.xmin = 0;  end
@@ -61,20 +61,10 @@ Grid.dz = Grid.Lz/Grid.Nz;        % dz of the gridblocks
 if Grid.xmin > Grid.xmax; error('xmin > xmax.'); end
 
 %% Number for fluxes
-if Grid.Nx > 1
-    Grid.Nfx = (Grid.Nx+1)*Grid.Ny;
-else
-    Grid.Nfx = 0;
-end
-
-Grid.Nfy = Grid.Nx*(Grid.Ny+1);
-if Grid.Ny == 1
-    Grid.Nf = Grid.Nfx;
-elseif Grid.Nx == 1
-    Grid.Nf = Grid.Nfy;
-else
-    Grid.Nf = Grid.Nfx + Grid.Nfy;
-end
+Grid.Nfx = (Grid.Nx+1)*Grid.Ny*Grid.Nz;
+Grid.Nfy = Grid.Nx*(Grid.Ny+1)*Grid.Nz;
+Grid.Nfz = Grid.Nx*Grid.Ny*(Grid.Nz+1);
+Grid.Nf  = Grid.Nfx + Grid.Nfy + Grid.Nfz;
 
 
 % x, y, z coords of the 12 corners of the domain
@@ -102,8 +92,42 @@ Grid.dof_f = [1:Grid.Nf]';        % face degree of freedom/face number
 %% Boundary dof's
 % Boundary cells
 
+Grid.dof_xmin = [];
+Grid.dof_xmax = [];
+Grid.dof_ymin = [];
+Grid.dof_ymax = [];
+
+for i = 1:Grid.N
+    if mod(i,Grid.Nx*Grid.Ny)<=Grid.Ny && mod(i,Grid.Nx*Grid.Ny)> 0
+        Grid.dof_xmin = [Grid.dof_xmin;i];
+    end
+    if mod(i - 1,Grid.Nx*Grid.Ny)>=Grid.Nx*Grid.Ny - Grid.Ny
+        Grid.dof_xmax = [Grid.dof_xmax;i];
+    end
+    
+    if mod(i,Grid.Ny)==1
+        Grid.dof_ymin = [Grid.dof_ymin;i];
+    end
+    if mod(i,Grid.Ny)==0
+        Grid.dof_ymax = [Grid.dof_ymax;i];
+    end 
+end 
+
+Grid.dof_zmin =[1:Grid.Ny*Grid.Nx]';
+Grid.dof_zmax =[Grid.N - Grid.Ny*Grid.Nx+1:Grid.N]';
+
+
+
+
+%{
+%% Boundary dof's
+% Boundary cells
+
+Grid.dof_xmin = []
+
 for i = 1:N
-  
+    if mod(i,Grid.Nx*Grid.Ny)<=Grid.Ny, Grid.dof_xmin = [Grid.dof_xmin,i]; end
+    
 end 
 
 Grid.dof_xmin = [1:Grid.Ny]';
@@ -120,6 +144,9 @@ Grid.dof_f_xmin = Grid.dof_xmin;
 Grid.dof_f_xmax = [Grid.Nfx-Grid.Ny+1:Grid.Nfx]';
 Grid.dof_f_ymin = Grid.Nfx+[1:Grid.Ny+1:Grid.Nfy-Grid.Ny]';
 Grid.dof_f_ymax = Grid.Nfx+[Grid.Ny+1:Grid.Ny+1:Grid.Nfy]';
+
+%}
+
 
 % In preparation for irregular grid, store all cell volumes and face areas
 % Volumes are stored and indexed like unknowns. Areas are stored and indexed like fluxes
