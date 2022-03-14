@@ -16,7 +16,7 @@ Grid = build_grid3D(Grid);
 %boundary conditions
 BC.dof_dir = [Grid.dof_xmin;Grid.dof_xmax];
 BC.dof_f_dir= [Grid.dof_f_xmin;Grid.dof_f_xmax];
-BC.g = [zeros(length(Grid.dof_xmin),1);zeros(length(Grid.dof_xmax),1)];
+BC.g = [ones(length(Grid.dof_xmin),1);zeros(length(Grid.dof_xmax),1)];
 BC.dof_neu = [];
 BC.dof_f_neu = [];
 BC.qb = [];
