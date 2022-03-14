@@ -48,14 +48,11 @@ D = [Dx,Dy,Dz];
 %  Interior
 G = -D';
 
-
-%{
 % Set natural (homogeneous Neumann) boundary conditions
-dof_f_bnd = [Grid.dof_f_xmin;Grid.dof_f_xmax, ...
-             Grid.dof_f_ymin;Grid.dof_f_ymax, ...
+dof_f_bnd = [Grid.dof_f_xmin;Grid.dof_f_xmax; ...
+             Grid.dof_f_ymin;Grid.dof_f_ymax; ...
              Grid.dof_f_zmin;Grid.dof_f_zmax]; % all dof's on boundary
 G(dof_f_bnd,:) = 0;
-%}
 
 % 3) Discrete Curl operator (not defined in 1D)
 C = [];

@@ -116,6 +116,7 @@ end
 Grid.dof_zmin =[1:Grid.Ny*Grid.Nx]';
 Grid.dof_zmax =[Grid.N - Grid.Ny*Grid.Nx+1:Grid.N]';
 
+% Boundary faces
 Grid.dof_f_x = Grid.dof_f(1:Grid.Nfx);
 Grid.dof_f_x = reshape(Grid.dof_f_x,Grid.Ny,Grid.Nx+1,Grid.Nz);
 dummy = Grid.dof_f_x(:,1,:);
