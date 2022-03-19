@@ -118,7 +118,6 @@ def build_grid3D(Grid):
     Grid.dof_zmin = np.transpose(DOF[ :,:,0]).reshape(-1, 1)
     Grid.dof_zmax = np.transpose(DOF[:,:,-1]).reshape(-1, 1)
 
-
     # Boundary faces
     DOFx = np.transpose(np.array([list(range(1,Grid.Nfx+1,1))]).reshape((Grid.Nz,Grid.Nx+1,Grid.Ny)))
     Grid.dof_f_xmin = np.transpose(DOFx[:,0,:]).reshape(-1, 1)
