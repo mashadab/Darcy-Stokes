@@ -7,7 +7,8 @@
 #import library and modules
 import numpy as np
 import matplotlib.pyplot as plt
-
+import pyvista as pv
+from pyvista import examples
 ##############################################################################
 '''
 The function meshgrid() takes three vectors x, y and z that contain the 
@@ -22,16 +23,37 @@ g = lambda x,y,z: y
 h = lambda x,y,z: z
 
 Nx =4; Ny=3; Nz=2
-x = np.linspace(0,1,Nx)
-y = np.linspace(0,2,Ny)
-z = np.linspace(0,3,Nz)
-[Y,Z,X] = np.meshgrid(y,z,x)
+x = np.linspace(1,Nx,Nx)
+y = np.linspace(Nx+1,Nx+Ny+1,Ny)
+z = np.linspace(Nx+Ny+1,Nx+Ny+Nz+1,Nz)
+[X,Z,Y] = np.meshgrid(x,z,y)
 
 print('X:',X); print('Y:',Y); print('Z:',Z); print(X.shape)
 
+print('Flatten X:',X.flatten()); 
+print('Flatten Y:',Y.flatten()); 
+print('Flatten Z:',Z.flatten()); 
+
+print('Y first, X second and Z third')
+
+arr = np.arange(27).reshape(3,3,3)
+
 #####################################################################################
-# A. When compaction length delta is greater than domain length H, HD= H/delta << 1
-#####################################################################################
+'''
+In the matrices X and Y, the -value increases with the row index, , and the 
+-value increases with the column index,  and k  in the third direction.  
+Since we index matrices as X(k,j,i) and Y(k,j,i), and Z(k,j,i), the first index 
+is the -coordinate. This makes it natural to order our grid y-first - see below! 
+'''
+
+# Create and plot structured grid
+grid = pv.StructuredGrid(X,Y,Z)
+
+# Add the data values to the cell data
+grid.point_data["values"] = g(X,Y,Z).flatten(order="F")  # Flatten the array!
+
+grid.plot(show_edges=True,show_grid=True)
+
 
 
 
