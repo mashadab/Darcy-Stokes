@@ -105,5 +105,70 @@ Grid.zmin = 0; Grid.zmax = 3; Grid.Nz = 100
 Grid = build_grid3D(Grid)
 [D,G,C,I,M] = build_ops3D(Grid); L = - D*G
 
+f   = lambda x,y,z: np.exp(np.cos(2*np.pi*x))*np.exp(np.cos(2*np.pi*y))*np.exp(np.cos(2*np.pi*z))
+d2f = lambda x,y,z: -2*np.pi**2*f(x,y,z)*[ 2*np.cos(2*np.pi*x) + np.cos(4*np.pi*x) + \
+                                           2*np.cos(2*np.pi*y) + np.cos(4*np.pi*y) + \
+                                           2*np.cos(2*np.pi*z) + np.cos(4*np.pi*z) - 3]
+
+[X,Z,Y] = np.meshgrid(Grid.xc,Grid.zc,Grid.yc)
+
+soln = f(np.transpose([X.flatten()]),np.transpose([Y.flatten()]),np.transpose([Z.flatten()]))
+
+SOLN = soln.reshape(Grid.Nz,Grid.Nx,Grid.Ny)
+
+print('Norm for reshaped solution',np.linalg.norm(f(X,Y,Z)-SOLN))
 
 
+laplacian_numerical = D @ G @ f(np.transpose([X.flatten()]),np.transpose([Y.flatten()]),np.transpose([Z.flatten()]))
+laplacian_numerical = laplacian_numerical.reshape(Grid.Nz,Grid.Nx,Grid.Ny)
+
+laplacian_analytical = d2f(np.transpose([X.flatten()]),np.transpose([Y.flatten()]),np.transpose([Z.flatten()]))
+laplacian_analytical = laplacian_analytical.reshape(Grid.Nz,Grid.Nx,Grid.Ny)
+
+print('Norm for reshaped laplacian',np.linalg.norm(laplacian_analytical-laplacian_numerical))
+
+
+#####################################################################################
+'''
+In the matrices X and Y, the -value increases with the row index, , and the 
+-value increases with the column index,  and k  in the third direction.  
+Since we index matrices as X(k,i,j) and Y(k,j,i), and Z(k,i,j), the first index 
+is the -coordinate. This makes it natural to order our grid y-first - see below! 
+'''
+
+# Create and plot structured grid
+grid = pv.StructuredGrid(X,Y,Z)
+
+# Add the data values to the cell data
+grid.point_data["values"] = laplacian_numerical.flatten(order="F")  # Flatten the array!
+
+grid.plot(show_edges=True,show_grid=True)
+
+# Add the data values to the cell data
+grid.point_data["values"] = laplacian_analytical.flatten(order="F")  # Flatten the array!
+
+grid.plot(show_edges=True,show_grid=True)
+
+#####################################################################################
+#plotting 
+fig, (ax1, ax2, ax3) = plt.subplots(3,1, figsize=(10,7))
+fig.suptitle(f'Analytic vs numerical on centerlines')
+
+ax1.plot(Grid.xc,laplacian_analytical[int(Grid.Ny/2),:,int(Grid.Nz/2)],'r-',label=r'$Analytical$')
+ax1.plot(Grid.xc,laplacian_numerical[int(Grid.Ny/2),:,int(Grid.Nz/2)],'bo',label=r'$Numerical$')
+ax1.set_ylabel('$d2f$')
+ax1.set_xlabel('$x$')
+ax1.legend(loc = 'best')
+
+ax2.plot(Grid.xc,laplacian_analytical[:,int(Grid.Nx/2),int(Grid.Nz/2)],'r-',label=r'$Analytical$')
+ax2.plot(Grid.xc,laplacian_numerical[:,int(Grid.Nx/2),int(Grid.Nz/2)],'bo',label=r'$Numerical$')
+ax2.set_ylabel('$d2f$')
+ax2.set_xlabel('$y$')
+
+ax3.plot(Grid.xc,laplacian_analytical[int(Grid.Ny/2),int(Grid.Nx/2),:],'r-',label=r'$Analytical$')
+ax3.plot(Grid.xc,laplacian_numerical[int(Grid.Ny/2),int(Grid.Nx/2),:],'bo',label=r'$Numerical$')
+ax3.set_ylabel('$d2f$')
+ax3.set_xlabel('$z$')
+
+
+plt.tight_layout()
