@@ -64,7 +64,6 @@ G =  zero_rows(G,dof_f_bnd)
 I = (sp.eye(Grid.N)).tocsr()
 
 
-
 #plotting 
 fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(15,7))
 fig.suptitle(f'Divergence for Nx = {Grid.Nx}, Ny = {Grid.Ny} and Nz = {Grid.Nz}')
@@ -74,5 +73,20 @@ ax2.set_title('Dy')
 ax2.spy(Dy)
 ax3.set_title('Dz')
 ax3.spy(Dz)
-
 plt.tight_layout()
+
+
+fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(15,7))
+fig.suptitle(f'Gradient for Nx = {Grid.Nx}, Ny = {Grid.Ny} and Nz = {Grid.Nz}')
+ax1.set_title('Gx')
+ax1.spy(G[0:Grid.Nfx,:])
+ax2.set_title('Gy')
+ax2.spy(G[Grid.Nfx:Grid.Nfx+Grid.Nfy,:])
+ax3.set_title('Gz')
+ax3.spy(G[Grid.Nf-Grid.Nfz:Grid.Nf,:])
+plt.tight_layout()
+
+L = -D @ G
+fig = plt.figure(figsize=(10,10))
+fig.suptitle(f'Laplacian for Nx = {Grid.Nx}, Ny = {Grid.Ny} and Nz = {Grid.Nz}')
+plt.spy(L)
