@@ -15,6 +15,7 @@ from pyvista import examples
 
 from classfun import *
 from build_gridfun3D import build_grid3D
+from build_opsfun3D  import build_ops3D
 import scipy.sparse as sp
 
 
@@ -62,7 +63,8 @@ G =  zero_rows(G,dof_f_bnd)
 
 #Identity
 I = (sp.eye(Grid.N)).tocsr()
-
+M = ((1.0*(np.abs(G))>0))
+M = 0.5*M
 
 #plotting 
 fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(15,7))
@@ -90,3 +92,18 @@ L = -D @ G
 fig = plt.figure(figsize=(10,10))
 fig.suptitle(f'Laplacian for Nx = {Grid.Nx}, Ny = {Grid.Ny} and Nz = {Grid.Nz}')
 plt.spy(L)
+
+
+#################################################################################
+#Testing the discrete divergence and gradients
+#################################################################################
+
+Grid.xmin = 0; Grid.xmax = 3; Grid.Nx = 100
+Grid.ymin = 0; Grid.ymax = 3; Grid.Ny = 100
+Grid.zmin = 0; Grid.zmax = 3; Grid.Nz = 100
+
+Grid = build_grid3D(Grid)
+[D,G,C,I,M] = build_ops3D(Grid); L = - D*G
+
+
+
