@@ -77,7 +77,7 @@ def build_grid3D(Grid):
     Grid.Nfx =  (Grid.Nx+1)*Grid.Ny*Grid.Nz
     Grid.Nfy =  Grid.Nx*(Grid.Ny+1)*Grid.Nz
     Grid.Nfz =  Grid.Nx*Grid.Ny*(Grid.Nz + 1)
-    Grid.Nf  =  Grid.Nfx + Grid.Nfy + Grid.Nz
+    Grid.Nf  =  Grid.Nfx + Grid.Nfy + Grid.Nfz
     
     #  x, y, z coords of the 12 corners of the domain
     Grid.xdom = [Grid.xmin,Grid.xmin,Grid.xmin,Grid.xmin,Grid.xmax,Grid.xmax,Grid.xmax,Grid.xmin,Grid.xmin,Grid.xmin,Grid.xmax,Grid.xmin,\
@@ -111,29 +111,29 @@ def build_grid3D(Grid):
     # make more efficient by avoidng DOF
     DOF = np.transpose(np.reshape(Grid.dof,(Grid.Nz,Grid.Nx,Grid.Ny)))
 
-    Grid.dof_xmin = DOF[:, 0,:].reshape(-1, 1)
-    Grid.dof_xmax = DOF[:,-1,:].reshape(-1, 1)
-    Grid.dof_ymin = DOF[:,:, 0].reshape(-1, 1)
-    Grid.dof_ymax = DOF[:,:,-1].reshape(-1, 1)
-    Grid.dof_zmin = DOF[ 0,:,:].reshape(-1, 1)
-    Grid.dof_zmax = DOF[-1,:,:].reshape(-1, 1)
+    Grid.dof_xmin = np.transpose(DOF[:, 0,:]).reshape(-1, 1)
+    Grid.dof_xmax = np.transpose(DOF[:,-1,:]).reshape(-1, 1)
+    Grid.dof_ymin = np.transpose(DOF[0,:,:]).reshape(-1, 1)
+    Grid.dof_ymax = np.transpose(DOF[-1,:,:]).reshape(-1, 1)
+    Grid.dof_zmin = np.transpose(DOF[ :,:,0]).reshape(-1, 1)
+    Grid.dof_zmax = np.transpose(DOF[:,:,-1]).reshape(-1, 1)
 
 
     # Boundary faces
     DOFx = np.transpose(np.array([list(range(1,Grid.Nfx+1,1))]).reshape((Grid.Nz,Grid.Nx+1,Grid.Ny)))
-    Grid.dof_f_xmin = DOFx[:,0,:]
-    Grid.dof_f_xmax = DOFx[:,-1,:]
+    Grid.dof_f_xmin = np.transpose(DOFx[:,0,:]).reshape(-1, 1)
+    Grid.dof_f_xmax = np.transpose(DOFx[:,-1,:]).reshape(-1, 1)
 
     #Grid.dof_f_xmin = Grid.dof_xmin
     #Grid.dof_f_xmax = np.transpose(np.array([list(range(Grid.Nfx-Grid.Ny+1,Grid.Nfx+1,1))]))
 
     DOFy = np.transpose(np.reshape(Grid.Nfx + np.array([list(range(1,Grid.Nfy+1,1))]),(Grid.Nz,Grid.Nx,Grid.Ny+1)))
-    Grid.dof_f_ymin = DOFy[:,:,0].reshape(-1, 1)
-    Grid.dof_f_ymax = DOFy[:,:,-1].reshape(-1, 1)
+    Grid.dof_f_ymin = np.transpose(DOFy[ 0,:,:]).reshape(-1, 1)
+    Grid.dof_f_ymax = np.transpose(DOFy[-1,:,:]).reshape(-1, 1)
 
     DOFz = np.transpose(np.reshape(Grid.Nfx +Grid.Nfy + np.array([list(range(1,Grid.Nfz+1,1))]),(Grid.Nz+1,Grid.Nx,Grid.Ny)))
-    Grid.dof_f_zmin = DOFz[0,:,:].reshape(-1, 1)
-    Grid.dof_f_zmax = DOFz[-1,:,:].reshape(-1, 1)
+    Grid.dof_f_zmin = np.transpose(DOFz[:,:, 0]).reshape(-1, 1)
+    Grid.dof_f_zmax = np.transpose(DOFz[:,:,-1]).reshape(-1, 1)
 
     Grid.A  = np.concatenate([np.ones((Grid.Nfx,1))*Grid.dy*Grid.dz,np.ones((Grid.Nfy,1))*Grid.dx*Grid.dz,np.ones((Grid.Nfz,1))*Grid.dx*Grid.dy,[[Grid.dx*Grid.dy*Grid.dz]]], axis=0 )
     Grid.V  = np.ones((Grid.N,1))*Grid.dx*Grid.dy*Grid.dz
