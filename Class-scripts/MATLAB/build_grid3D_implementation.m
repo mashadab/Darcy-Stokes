@@ -16,7 +16,7 @@ Grid = build_grid3D(Grid);
 %boundary conditions
 BC.dof_dir = [Grid.dof_xmin;Grid.dof_xmax];
 BC.dof_f_dir= [Grid.dof_f_xmin;Grid.dof_f_xmax];
-BC.g = [ones(length(Grid.dof_xmin),1);zeros(length(Grid.dof_xmax),1)];
+BC.g = [zeros(length(Grid.dof_xmin),1);zeros(length(Grid.dof_xmax),1)];
 BC.dof_neu = [];
 BC.dof_f_neu = [];
 BC.qb = [];
@@ -31,8 +31,9 @@ Xo=(Grid.xmax - Grid.xmin)/2;Yo=(Grid.ymax - Grid.ymin)/2;Zo=(Grid.zmax - Grid.z
 fs((X-Xo).^2 + (Y-Yo).^2 + (Z-Zo).^2 < 0.5) = 1.0;  %spherical source term at center
 
 %solving the linear boundary value problem
+tic
 u = solve_lbvp(L,fs+fn,B,BC.g,N);
-
+toc
 %plotting
 plotting(Grid,X,Y,Z,u)
 

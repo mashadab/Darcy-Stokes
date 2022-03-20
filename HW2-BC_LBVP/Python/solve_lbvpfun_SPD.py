@@ -37,13 +37,12 @@ def solve_lbvp(L,f,B,g,N):
     # Output:
     # u = column vector of the solution of size N by 1
     if B.nnz == 0:
-        u = linalg.spsolve(L, f)
+        u  = np.transpose([linalg.cg(L, f)[0]])
     else:
-        
-        up = np.transpose([sp.csr_matrix.transpose(B) @ linalg.spsolve((B @ sp.csr_matrix.transpose(B)),g)])
-        
-        u0 = np.transpose([N @ linalg.spsolve(sp.csr_matrix.transpose(N) @ L @ N,sp.csr_matrix.transpose(N) @ (f-L @ up))])
-        
+
+        up = sp.csr_matrix.transpose(B) @ np.transpose([linalg.cg((B @ sp.csr_matrix.transpose(B)),g)[0]])
+        u0 = np.transpose([N @ np.transpose([linalg.cg(sp.csr_matrix.transpose(N) @ L @ N,sp.csr_matrix.transpose(N) @ (f-L @ up))[0]])])
+
         u = u0 + up
 
     return u;

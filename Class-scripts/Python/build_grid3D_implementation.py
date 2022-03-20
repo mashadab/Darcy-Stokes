@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pyvista as pv
 from pyvista import examples
+import time
 
 from classfun import *
 from build_gridfun3D import build_grid3D
@@ -49,7 +50,10 @@ fs = np.zeros((Grid.N,1))
 Xo = (Grid.xmax-Grid.xmin)/2; Yo=(Grid.ymax-Grid.ymin)/2; Zo=(Grid.zmax-Grid.zmin)/2
 fs[((X_col-Xo)**2+(Y_col-Yo)**2+(Z_col-Zo)**2)<0.5] = 1.0 
 
+t1 = time.perf_counter()
 u = solve_lbvp(L, fs+fn, B, BC.g, N)
+t2 = time.perf_counter()
+print('Time elapsed',t2-t1)
 U = u.reshape(Grid.Nz,Grid.Nx,Grid.Ny)
 
 
