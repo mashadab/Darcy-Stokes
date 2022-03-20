@@ -15,7 +15,7 @@ import time
 from classfun import *
 from build_gridfun3D import build_grid3D
 from build_opsfun3D  import build_ops3D
-from solve_lbvpfun_optimized import solve_lbvp
+from solve_lbvpfun_SPD import solve_lbvp_SPD
 from build_bndfun_optimized import build_bnd
 import scipy.sparse as sp
 
@@ -51,7 +51,7 @@ Xo = (Grid.xmax-Grid.xmin)/2; Yo=(Grid.ymax-Grid.ymin)/2; Zo=(Grid.zmax-Grid.zmi
 fs[((X_col-Xo)**2+(Y_col-Yo)**2+(Z_col-Zo)**2)<0.5] = 1.0 
 
 t1 = time.perf_counter()
-u = solve_lbvp(L, fs+fn, B, BC.g, N)
+u = solve_lbvp_SPD(L, fs+fn, B, BC.g, N)
 t2 = time.perf_counter()
 print('Time elapsed',t2-t1)
 U = u.reshape(Grid.Nz,Grid.Nx,Grid.Ny)
