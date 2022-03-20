@@ -33,7 +33,7 @@ fs = np.zeros((Grid.N,1))
 #boundary conditions
 BC.dof_dir   = np.vstack([Grid.dof_xmin,Grid.dof_xmax])
 BC.dof_f_dir = np.vstack([Grid.dof_f_xmin,Grid.dof_f_xmin])
-BC.g         = np.vstack([np.zeros_like(Grid.dof_xmin),np.zeros_like(Grid.dof_xmax)])
+BC.g         = np.vstack([np.ones_like(Grid.dof_xmin),np.zeros_like(Grid.dof_xmax)])
 
 BC.dof_neu   = np.array([])
 BC.dof_f_neu = np.array([])
@@ -64,8 +64,17 @@ grid = pv.StructuredGrid(X,Y,Z)
 # Add the data values to the cell data
 grid.point_data["values"] = U.flatten(order="F")  # Flatten the array!
 
-grid.plot(show_edges=True,show_grid=True)
+#grid.plot(show_edges=True,show_grid=True)
 
+slices = grid.slice_orthogonal(x=1.5, y=1.5, z=1.5)
+slices.plot(show_edges=True,show_grid=True)
+plotter = pv.Plotter(off_screen=True)
+
+plotter.add_mesh(slices, show_edges=True)
+plotter.add_axes(line_width=5, labels_off=False)
+plotter.show_grid()
+#plotter.show(screenshot='heat_equation.png')
+plotter.save_graphic("heat_equation.pdf") 
 
 #####################################################################################
 #plotting 
