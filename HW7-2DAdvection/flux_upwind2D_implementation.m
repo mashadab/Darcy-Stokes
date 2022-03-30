@@ -23,6 +23,9 @@ BC.qb        = [];
 u = solve_lbvp(L,fs+fn,B,BC.g,N);
 v = comp_flux_gen(flux,res,u,Grid,BC);
 
+figure
+contourf(Xc,Yc,reshape(u,Grid.Ny,Grid.Nx))
+xlabel('x'), ylabel('y')
 
 %% Compute advection operator
 A = flux_upwind2D(v,Grid);
