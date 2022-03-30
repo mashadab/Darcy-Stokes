@@ -25,4 +25,4 @@ v = comp_flux_gen(flux,res,u,Grid,BC);
 
 
 %% Compute advection operator
-A = flux_upwind2D(v,Grid)
+A = flux_upwind2D(v,Grid);
