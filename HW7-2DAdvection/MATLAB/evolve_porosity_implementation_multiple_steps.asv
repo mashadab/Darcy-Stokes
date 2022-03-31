@@ -74,7 +74,7 @@ for i = 1:Param.Nt
     % Solve the problem
     [hD,pD,qD] = solve_Helmholtz(D,G,I,M,phiD,Param.n,Param.m,Grid,B_h,N_h,fn_h,BC.h,Zc,0);
     [uD,vD]    = solve_Poisson(D,G,I,phiD,Param.m,pD,Grid,B_u,N_u,fn_u,BC.u);
-    [phiD,Av]  = evolve_porosity(D,I,phiD,vD,pD,B_phi,N_phi,BC.phi,Grid,Param.phi_shell,Param.theta,Param.dtD);
+    [phiD,Av]  = evolve_porosity(D,I,phiD,vD,pD,B_phi,N_phi,BC.phi,Grid,Param.phi_shell,Param.theta,,Param.dtD);
 
     % Check for error
     if max(phiD*Param.phi_shell) > 1 || min(phiD*Param.phi_shell) < 0; error('Porosity outside  [0 1].\n'); end
