@@ -34,7 +34,7 @@ fs = np.zeros((Grid.N,1))
 #boundary conditions
 BC.dof_dir   = np.vstack([Grid.dof_xmin,Grid.dof_xmax])
 BC.dof_f_dir = np.vstack([Grid.dof_f_xmin,Grid.dof_f_xmin])
-BC.g         = np.vstack([np.ones_like(Grid.dof_xmin),np.zeros_like(Grid.dof_xmax)])
+BC.g         = np.vstack([np.zeros_like(Grid.dof_xmin),np.zeros_like(Grid.dof_xmax)])
 
 BC.dof_neu   = np.array([])
 BC.dof_f_neu = np.array([])
@@ -55,7 +55,6 @@ u = solve_lbvp_SPD(L, fs+fn, B, BC.g, N)
 t2 = time.perf_counter()
 print('Time elapsed',t2-t1)
 U = u.reshape(Grid.Nz,Grid.Nx,Grid.Ny)
-
 
 #####################################################################################
 '''

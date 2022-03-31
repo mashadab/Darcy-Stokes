@@ -62,10 +62,6 @@ I = speye(Grid.N);
 
 % 5) Sparse Mean
 % Interior
-M = 0.5*Grid.dx*abs(G);
+M = G;
+M(M~=0) = 0.5;
 
-%{
-% Boundaries
-M(1,1)  = 1; 
-M(Grid.Nfx,Grid.Nx) = 1;
-%}
