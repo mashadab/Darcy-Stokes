@@ -58,10 +58,10 @@ BC.h.qb        = np.array([[0],[0]])
 #2. Poisson equation 
 BC.u.dof_dir   = np.array([Grid.dof_xmin[0]])
 BC.u.dof_f_dir = np.array([Grid.dof_f_xmin[0]]) 
-BC.u.g         = np.array([[0]]) 
-BC.u.dof_neu   = np.array([Grid.dof_xmax[0]])
-BC.u.dof_f_neu = np.array([Grid.dof_f_xmax[0]])
-BC.u.qb        = np.array([[0]])
+BC.u.g         = np.array([0]) 
+BC.u.dof_neu   = Grid.dof_xmax
+BC.u.dof_f_neu = Grid.dof_f_xmax
+BC.u.qb        = np.transpose([np.zeros_like(Grid.dof_xmax)])
 
 [B_u,N_u,fn_u]     = build_bnd(BC.u, Grid, I)
 
