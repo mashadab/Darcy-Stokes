@@ -36,8 +36,8 @@ Param.theta = .5;              # Crank-Nicholson (implicit)
 
 
 # Build grid and operator
-Grid.xmin = 0; Grid.xmax = Param.HD; Grid.Nx = 5
-Grid.ymin = 0; Grid.ymax = Param.LD; Grid.Ny = 5
+Grid.xmin = 0; Grid.xmax = Param.HD; Grid.Nx = 100
+Grid.ymin = 0; Grid.ymax = Param.LD; Grid.Ny = 100
 Grid        = build_grid(Grid)
 [Xc,Zc] = np.meshgrid(Grid.xc,Grid.yc)
 Xc_col  = np.reshape(np.transpose(Xc), (Grid.N,-1))
@@ -79,7 +79,9 @@ BC.phi.qb       = np.transpose([np.hstack([np.zeros_like(Grid.dof_xmin),np.zeros
 [B_phi,N_phi,fn_phi] = build_bnd(BC.phi, Grid, I)
 
 ## Initial condition
-phiD = 1 + 0.1*np.cos(2*np.pi/Param.HD*Zc_col)
+
+#phiD = 1 + 0.1*np.cos(2*np.pi/Param.HD*Zc_col)
+phiD = np.ones((Grid.N,1))+1e-2*np.random.randn(Grid.N,1)
 
 ## Solve the equations for one timestep
 #1. Helmholtz equation 
