@@ -36,8 +36,8 @@ Param.theta = .5;              # Crank-Nicholson (implicit)
 
 
 # Build grid and operator
-Grid.xmin = 0; Grid.xmax = Param.HD; Grid.Nx = 100
-Grid.ymin = 0; Grid.ymax = Param.LD; Grid.Ny = 100
+Grid.xmin = 0; Grid.xmax = Param.HD; Grid.Nx = 5
+Grid.ymin = 0; Grid.ymax = Param.LD; Grid.Ny = 5
 Grid        = build_grid(Grid)
 [Xc,Zc] = np.meshgrid(Grid.xc,Grid.yc)
 Xc_col  = np.reshape(np.transpose(Xc), (Grid.N,-1))
@@ -96,17 +96,17 @@ phiD = 1 + 0.1*np.cos(2*np.pi/Param.HD*Zc_col)
 ## Plotting the solution
 fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4,figsize=(20,7))
 fig.suptitle('2D Gravity Drainage problem')
-plot1 = ax1.contourf(Xc,Zc,(np.transpose(phiD)).reshape(Grid.Ny,Grid.Nx))
+plot1 = ax1.contourf(Xc,Zc,np.transpose(phiD.reshape(Grid.Nx,Grid.Ny)))
 ax1.set_xlabel(r'$x_D$')
 ax1.set_ylabel(r'$z_D$')
 ax1.set_title('$\phi_D$')
 
-plot2 = ax2.contourf(Xc,Zc,(np.transpose(hD)).reshape(Grid.Ny,Grid.Nx))
+plot2 = ax2.contourf(Xc,Zc,np.transpose(hD.reshape(Grid.Nx,Grid.Ny)))
 ax2.set_xlabel(r'$x_D$')
 ax2.set_ylabel(r'$z_D$')
 ax2.set_title('$h_D$')
 
-ax3.contourf(Xc,Zc,(np.transpose(pD)).reshape(Grid.Ny,Grid.Nx))
+ax3.contourf(Xc,Zc,np.transpose(pD.reshape(Grid.Nx,Grid.Ny)))
 ax3.set_xlabel(r'$x_D$')
 ax3.set_ylabel(r'$z_D$')
 ax3.set_title('$p_D$')
@@ -114,13 +114,13 @@ ax3.set_title('$p_D$')
 #For flux
 Xfx,Xfy = np.meshgrid(Grid.xf,Grid.yc)
 Yfx,Yfy = np.meshgrid(Grid.xc,Grid.yf)
-qx      = qD[0:Grid.Nfx].reshape(Grid.Ny,Grid.Nx+1)
-qy      = qD[Grid.Nfx:Grid.Nf].reshape(Grid.Ny+1,Grid.Nx)
+qx      = np.transpose(qD[0:Grid.Nfx].reshape(Grid.Nx+1,Grid.Ny))
+qy      = np.transpose(qD[Grid.Nfx:Grid.Nf].reshape(Grid.Nx,Grid.Ny+1))
 
-ax4.contourf(Xfx,Xfy,qx)
+#ax4.contourf(Xfx,Xfy,qx)
 ax4.contourf(Yfx,Yfy,qy)
 ax4.set_xlabel(r'$x_D$')
 ax4.set_ylabel(r'$z_D$')
-ax4.set_title('$qD$')
+ax4.set_title('$qDy$')
 
 plt.tight_layout()
