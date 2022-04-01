@@ -19,6 +19,7 @@ from comp_fluxfun_gen import comp_flux_gen
 from comp_mean_matrix import comp_mean
 from solve_Helmholtz import solve_Helmholtz
 from solve_Poisson import solve_Poisson
+from evolve_porosity import evolve_porosity
 
 #Simulation parameters
 Param.HD = 25;                 # Dimensionless ice shell thickness    [-]
@@ -78,7 +79,7 @@ BC.phi.qb       = np.transpose([np.hstack([np.zeros_like(Grid.dof_xmin),np.zeros
 ## Initial condition
 phiD = 1 + 0.1*np.cos(2*np.pi/Param.HD*Zc_col)
 
-## Solve the equations
+## Solve the equations for one timestep
 #1. Helmholtz equation 
 [hD,pD,qD] = solve_Helmholtz(D,G,I,M,phiD,Param.n,Param.m,Grid,B_h,N_h,fn_h,BC.h,Zc_col,Gamma)
 
@@ -90,14 +91,18 @@ phiD = 1 + 0.1*np.cos(2*np.pi/Param.HD*Zc_col)
 
 
 
+#Plotting the solution
+fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4,figsize=(20,7))
+fig.suptitle('2D Gravity Drainage problem')
+ax1.contourf(Xc,Zc,(np.transpose(phiD)).reshape(Grid.Ny,Grid.Nx))
+ax1.set_ylabel(r'$z_D$')
+ax1.set_ylabel(r'$z_D$')
+ax1.set_title('$\phi_D$')
 
+
+plt.tight_layout()
 
 '''
-
-#Plotting the solution
-fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4,figsize=(10,7))
-fig.suptitle('Modified Helmholtz and Poisson problems')
-
 ax1.plot(phi,zc,label='$\phi_D$')
 ax1.set_xlabel(r'$\phi_D$')
 ax1.set_ylabel(r'$z_D$')
@@ -114,7 +119,6 @@ ax4.plot(qD,zf,label=r'$q_D$')
 ax4.plot(vD,zf,label=r'$v_D$')
 ax4.set_xlabel(r'$q_D,v_D$')
 ax4.legend(loc='best')
-plt.tight_layout()
 
 '''
 

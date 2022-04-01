@@ -38,7 +38,7 @@ def evolve_porosity(D,I,phiD,vD,pD,B,N,BC,Grid,phi_c,theta,dtD): # function
     
     #Solve porosity evolution equation
     Av  = flux_upwind(vD, Grid)
-    L   = phi_c * D @ Av - sp.spdiags(pD, 0, Grid.N, Grid.N) 
+    L   = phi_c * D @ Av - sp.spdiags(np.ravel(pD), 0, Grid.N, Grid.N) 
     IM  = I + dtD * (1-theta) * L
     EX  = I - dtD * theta * L
     phiD= solve_lbvp(IM,EX@phiD,B,BC.g,N)
