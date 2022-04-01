@@ -20,6 +20,7 @@ from comp_mean_matrix import comp_mean
 from solve_Helmholtz import solve_Helmholtz
 from solve_Poisson import solve_Poisson
 from evolve_porosity import evolve_porosity
+from comp_face_coords_fun import comp_face_coords
 
 #Simulation parameters
 Param.HD = 25;                 # Dimensionless ice shell thickness    [-]
@@ -91,34 +92,34 @@ phiD = 1 + 0.1*np.cos(2*np.pi/Param.HD*Zc_col)
 
 
 
-#Plotting the solution
+## Plotting the solution
 fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4,figsize=(20,7))
 fig.suptitle('2D Gravity Drainage problem')
 ax1.contourf(Xc,Zc,(np.transpose(phiD)).reshape(Grid.Ny,Grid.Nx))
-ax1.set_ylabel(r'$z_D$')
+ax1.set_xlabel(r'$x_D$')
 ax1.set_ylabel(r'$z_D$')
 ax1.set_title('$\phi_D$')
 
+ax2.contourf(Xc,Zc,(np.transpose(hD)).reshape(Grid.Ny,Grid.Nx))
+ax2.set_ylabel(r'$z_D$')
+ax2.set_ylabel(r'$z_D$')
+ax2.set_title('$h_D$')
+
+ax3.contourf(Xc,Zc,(np.transpose(pD)).reshape(Grid.Ny,Grid.Nx))
+ax3.set_ylabel(r'$z_D$')
+ax3.set_xlabel(r'$x_D$')
+ax3.set_title('$p_D$')
+
+#For flux
+Xfx,Xfy = np.meshgrid(Grid.xf,Grid.yc)
+Yfx,Yfy = np.meshgrid(Grid.xc,Grid.yf)
+qx      = qD[0:Grid.Nfx].reshape(Grid.Ny,Grid.Nx+1)
+qy      = qD[Grid.Nfx:Grid.Nf].reshape(Grid.Ny+1,Grid.Nx)
+
+ax4.contourf(Xfx,Xfy,qx)
+ax4.contourf(Yfx,Yfy,qy)
+ax4.set_xlabel(r'$x_D$')
+ax4.set_ylabel(r'$z_D$')
+ax4.set_title('$qD$')
 
 plt.tight_layout()
-
-'''
-ax1.plot(phi,zc,label='$\phi_D$')
-ax1.set_xlabel(r'$\phi_D$')
-ax1.set_ylabel(r'$z_D$')
-
-ax2.plot(hD,zc,label=r'$h_D$')
-ax2.plot(uD,zc,label=r'$u_D$')
-ax2.set_xlabel(r'$h_D,u_D$')
-ax2.legend(loc='best')
-
-ax3.plot(pD,zc)
-ax3.set_xlabel(r'$p_D$')
-
-ax4.plot(qD,zf,label=r'$q_D$')
-ax4.plot(vD,zf,label=r'$v_D$')
-ax4.set_xlabel(r'$q_D,v_D$')
-ax4.legend(loc='best')
-
-'''
-
