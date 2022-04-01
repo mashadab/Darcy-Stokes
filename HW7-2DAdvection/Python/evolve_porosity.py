@@ -1,5 +1,6 @@
 # import python libraries
 import scipy.sparse as sp
+import numpy as np
 
 import sys
 sys.path.insert(1, '../../HW1-Numerics/Python/')
@@ -42,4 +43,6 @@ def evolve_porosity(D,I,phiD,vD,pD,B,N,BC,Grid,phi_c,theta,dtD): # function
     EX  = I - dtD * theta * L
     phiD= solve_lbvp(IM,EX@phiD,B,BC.g,N)
 
+    if np.max(phiD*phi_c) > 1 or np.min(phiD*phi_c) < 0:
+        raise Exception("Porosity outside  [0 1].\n")
     return phiD,Av;
