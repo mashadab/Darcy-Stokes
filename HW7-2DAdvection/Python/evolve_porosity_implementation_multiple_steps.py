@@ -35,12 +35,12 @@ Param.n = 2;                   # compaction viscosity exponent [-]
 Param.tDmax = 4;               # Dimensionless simulation time [-]
 Param.theta = .5;              # Crank-Nicholson (implicit)
 Param.Nt    = Param.tDmax*50
-Param.plot_interval = 50
+Param.plot_interval = 10
 Param.dtD   = Param.tDmax/Param.Nt
 
 # Build grid and operator
-Grid.xmin = 0; Grid.xmax = Param.HD; Grid.Nx = 100
-Grid.ymin = 0; Grid.ymax = Param.LD; Grid.Ny = 100
+Grid.xmin = 0; Grid.xmax = Param.HD; Grid.Nx = 200
+Grid.ymin = 0; Grid.ymax = Param.LD; Grid.Ny = 200
 Grid        = build_grid(Grid)
 [Xc,Zc] = np.meshgrid(Grid.xc,Grid.yc)
 Xc_col  = np.reshape(np.transpose(Xc), (Grid.N,-1))
@@ -84,7 +84,7 @@ BC.phi.qb       = np.transpose([np.hstack([np.zeros_like(Grid.dof_xmin),np.zeros
 ## Initial condition
 
 #phiD = 1 + 0.1*np.cos(2*np.pi/Param.HD*Zc_col)
-phiD = np.ones((Grid.N,1))+1e-2*np.random.randn(Grid.N,1)
+phiD = np.ones((Grid.N,1))+1e-1*np.random.randn(Grid.N,1)
 
 phi_D_sol = phiD.copy()
 tD  = 0
@@ -205,7 +205,7 @@ def update_plot(frame_number, zarray, plot,t):
     mm.set_array(zarray[:,frame_number])
     mm.set_clim(np.min(phi_D_sol), np.max(phi_D_sol))
     clb = plt.colorbar(mm, pad=0.1)
-    clb.set_label(r'$s_w$', labelpad=-3,x=-3, y=1.13, rotation=0)
+    clb.set_label(r'$\phi_D$', labelpad=-3,x=-3, y=1.13, rotation=0)
     
 
 fig = plt.figure(figsize=(10,10) , dpi=100)
