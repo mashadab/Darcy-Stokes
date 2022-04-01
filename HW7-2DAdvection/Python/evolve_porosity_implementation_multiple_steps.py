@@ -9,7 +9,8 @@ sys.path.insert(1, '../../HW6-2D_operators/Python/')
 import numpy as np
 import scipy.sparse as sp
 import matplotlib.pyplot as plt
-from matplotlib import colormaps as cm
+from matplotlib import cm
+import matplotlib.animation as animation
 
 from classfun import *
 from build_gridfun2D import build_grid 
@@ -21,7 +22,7 @@ from comp_mean_matrix import comp_mean
 from solve_Helmholtz import solve_Helmholtz
 from solve_Poisson import solve_Poisson
 from evolve_porosity import evolve_porosity
-from matplotlib import colormaps as cm
+
 
 #Simulation parameters
 Param.HD = 25;                 # Dimensionless ice shell thickness    [-]
@@ -33,7 +34,9 @@ Param.m = 1;                   # compaction viscosity exponent [-]
 Param.n = 2;                   # compaction viscosity exponent [-]
 Param.tDmax = 4;               # Dimensionless simulation time [-]
 Param.theta = .5;              # Crank-Nicholson (implicit)
-
+Param.Nt    = Param.tDmax*50
+Param.plot_interval = 50
+Param.dtD   = Param.tDmax/Param.Nt
 
 # Build grid and operator
 Grid.xmin = 0; Grid.xmax = Param.HD; Grid.Nx = 100
@@ -83,15 +86,27 @@ BC.phi.qb       = np.transpose([np.hstack([np.zeros_like(Grid.dof_xmin),np.zeros
 #phiD = 1 + 0.1*np.cos(2*np.pi/Param.HD*Zc_col)
 phiD = np.ones((Grid.N,1))+1e-2*np.random.randn(Grid.N,1)
 
-## Solve the equations for one timestep
-#1. Helmholtz equation 
-[hD,pD,qD] = solve_Helmholtz(D,G,I,M,phiD,Param.n,Param.m,Grid,B_h,N_h,fn_h,BC.h,Zc_col,Gamma)
+phi_D_sol = phiD.copy()
+tD  = 0
+tD_sol = [tD]
 
-#2. Poisson equation 
-[uD,vD]    = solve_Poisson(D,G,I,phiD,Param.m,pD,Grid,B_u,N_u,fn_u,BC.u)
-
-#3. Porosity evolution equation 
-[phiD,Av]  = evolve_porosity(D,I,phiD,vD,pD,B_phi,N_phi,BC.phi,Grid,Param.phi_shell,Param.theta,.1);
+#time loop
+for i in range(1,Param.Nt):
+    tD = tD + Param.dtD
+    ## Solve the equations for one timestep
+    #1. Helmholtz equation 
+    [hD,pD,qD] = solve_Helmholtz(D,G,I,M,phiD,Param.n,Param.m,Grid,B_h,N_h,fn_h,BC.h,Zc_col,Gamma)
+    
+    #2. Poisson equation 
+    [uD,vD]    = solve_Poisson(D,G,I,phiD,Param.m,pD,Grid,B_u,N_u,fn_u,BC.u)
+    
+    #3. Porosity evolution equation 
+    [phiD,Av]  = evolve_porosity(D,I,phiD,vD,pD,B_phi,N_phi,BC.phi,Grid,Param.phi_shell,Param.theta,.1)
+    
+    if i % Param.plot_interval ==0:
+        phi_D_sol = np.hstack([phi_D_sol,phiD])
+        tD_sol.append(tD)
+        print(i,tD)
 
 
 
@@ -164,3 +179,55 @@ plt.xlabel(r'$x_D$')
 plt.ylabel(r'$z_D$')
 plt.title('$q_Dx$')
 plt.colorbar()
+
+
+'''
+#New Contour plot
+fps = 100000 # frame per sec
+#frn = endstop # frame number of the animation
+C_sol = phi_D_sol
+[N,frn] = np.shape(C_sol) # frame number of the animation from the saved file
+
+def update_plot(frame_number, zarray, plot,t):
+    plt.clf()
+    zarray  = zarray
+    plot[0] = plt.contourf(Xc, Zc, np.transpose(zarray[:,frame_number].reshape(Grid.Nx,Grid.Ny)), cmap="Blues",vmin = np.min(phi_D_sol), vmax = np.max(phi_D_sol))
+    plt.title("t= %0.4f" % t[frame_number],loc = 'center', fontsize=18)
+    #plt.axis('scaled')
+    #plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
+    #clb = fig.colorbar(plot[0], orientation='vertical',aspect=50, pad=-0.1)
+    plt.clim(0,1)
+    
+    
+    plt.xlim([Grid.xmin, Grid.xmax])
+    plt.ylim([Grid.ymin,Grid.ymax])
+    mm = plt.cm.ScalarMappable(cmap=cm.Blues)
+    mm.set_array(zarray[:,frame_number])
+    mm.set_clim(np.min(phi_D_sol), np.max(phi_D_sol))
+    clb = plt.colorbar(mm, pad=0.1)
+    clb.set_label(r'$s_w$', labelpad=-3,x=-3, y=1.13, rotation=0)
+    
+
+fig = plt.figure(figsize=(10,10) , dpi=100)
+plot = [plt.contourf(Xc, Zc, np.transpose((phi_D_sol[:,0]).reshape(Grid.Nx,Grid.Ny)),cmap="Blues",vmin = np.min(phi_D_sol), vmax = np.max(phi_D_sol))]
+#manager = plt.get_current_fig_manager()
+#manager.window.showMaximized()
+#clb = fig.colorbar(plot[0], orientation='horizontal',aspect=50, pad=-0.1)
+#clb = fig.colorbar(plot[0], orientation='vertical',aspect=50, pad=-0.1)
+plt.ylabel(r'$z$')
+plt.xlabel(r'$x$')
+plt.xlim([Grid.xmin, Grid.xmax])
+plt.ylim([Grid.ymin,Grid.ymax])
+#plt.axis('scaled')
+
+mm = plt.cm.ScalarMappable(cmap=cm.Blues)
+mm.set_array(phiD)
+mm.set_clim(np.min(phi_D_sol), np.max(phi_D_sol))
+clb = plt.colorbar(mm, pad=0.1)
+clb.set_label(r'$\phi_D$', labelpad=-3,x=-3, y=1.13, rotation=0)
+plt.title("t= %0.4f" % tD_sol[0],loc = 'center', fontsize=18)
+#plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
+ani = animation.FuncAnimation(fig, update_plot, frn, fargs=(phi_D_sol[:,:], plot[:],tD_sol[:]), interval=1/fps)
+ani.save(f"gravity_drainage_{Grid.Nx}by{Grid.Ny}_tf{Param.tDmax}_phiDsingle.mov", writer='ffmpeg', fps=30)
+
+'''
