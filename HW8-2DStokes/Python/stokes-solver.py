@@ -10,6 +10,7 @@ sys.path.insert(1, '../../HW4-1DMelt-Migration/Python/')
 sys.path.insert(1, '../../HW6-2D_operators/Python/')
 
 from scipy.sparse import bmat,csr_matrix
+import matplotlib.pyplot as plt
 
 # import personal libraries
 from classfun import *  #importing the classes and relevant functions
@@ -30,8 +31,8 @@ from quiver_plot import quiver_plot
 mu  = 1.0  #Viscosity nondimensionalized 
 
 #building grid
-Gridp.xmin = 0.0 ; Gridp.xmax = 1 ; Gridp.Nx   = 10
-Gridp.ymin = 0.0 ; Gridp.ymax = 1 ; Gridp.Ny   = 10
+Gridp.xmin = 0.0 ; Gridp.xmax = 1 ; Gridp.Nx   = 5
+Gridp.ymin = 0.0 ; Gridp.ymax = 1 ; Gridp.Ny   = 5
 Grid = build_stokes_grid(Gridp)
 
 #simulation name
@@ -44,7 +45,7 @@ D, Edot, Dp, Gp, I = build_stokes_ops(Grid)
 A  = 2.0 * mu * D @ Edot
 L  = bmat([[A, -Gp], [Dp, None]],format="csr")
 fs = csr_matrix((Grid.N, 1), dtype=np.float64)
-
+'''
 #Boundary conditions
 if 'lid_driven_cavity_flow' in simulation_type:
     Grid.dof_no_pene = np.concatenate((Grid.Vx.dof_xmin, Grid.Vx.dof_xmax, Grid.Vx.N+Grid.Vy.dof_ymin , Grid.Vx.N+Grid.Vy.dof_ymax))
@@ -67,3 +68,20 @@ v = u[:Grid.p.Nf,:]; p = u[Grid.p.Nf+1:,:] #Extracting velocity and pressure ins
 
 #Plotting
 quiver_plot(simulation_name,Grid,v)
+'''
+
+## Plotting the solution
+fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4,figsize=(20,7))
+ax1.set_title(f'D, nz={D.nnz}')
+ax1.spy(D)
+
+ax2.set_title(f'Edot, nz={Edot.nnz}')
+ax2.spy(Edot)
+
+ax3.set_title(f'A, nz={A.nnz}')
+ax3.spy(A)
+
+ax4.set_title(f'L, nz={L.nnz}')
+ax4.spy(L)
+
+plt.tight_layout()
