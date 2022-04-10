@@ -1,7 +1,7 @@
 # Stokes solver
 # author: Mohammad Afzal Shadab
 # email: mashadab@utexas.edu
-# date: 02/12/2021
+# date: 04/09/2022
 import sys
 sys.path.insert(1, '../../HW1-Numerics/Python/')
 sys.path.insert(1, '../../HW2-BC_LBVP/Python/')
@@ -9,6 +9,7 @@ sys.path.insert(1, '../../HW3-Hetero-Fluxes-NeuBC/Python/')
 sys.path.insert(1, '../../HW4-1DMelt-Migration/Python/')
 sys.path.insert(1, '../../HW6-2D_operators/Python/')
 
+# import Python libraries
 from scipy.sparse import bmat,csr_matrix
 import matplotlib.pyplot as plt
 
