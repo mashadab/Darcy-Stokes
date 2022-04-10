@@ -32,7 +32,7 @@ def build_stokes_ops(Grid):
     #Making the I operator
     I = eye(Grid.p.Nf+Grid.p.N , dtype=np.float64,format="csr")
     
-    
+    '''
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4,figsize=(20,7))
     ax1.set_title(f'DVxx, nz={DVxx.nnz}')
     ax1.spy(DVxx)
@@ -45,7 +45,7 @@ def build_stokes_ops(Grid):
 
     ax4.set_title(f'GVxy, nz={GVxy.nnz}')
     ax4.spy(GVxy)
-
+    '''
     
     
     return D, Edot, Dp, Gp, I;

@@ -10,7 +10,7 @@ Grid = build_stokes_grid(Gridp);
 A = 2*mu*D*Edot; % 
 L = [A, -Gp;...
      Dp, Z];
-
+figure()
 subplot 141
 spy(D), title 'D'
 subplot 142

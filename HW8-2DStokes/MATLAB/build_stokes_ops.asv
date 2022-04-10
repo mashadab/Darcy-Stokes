@@ -34,16 +34,16 @@ D = [Dxx, Zyx', Dxy; ...
  % Identity for all dof's
  I = speye(Grid.N);
  
-subplot 141
-title('Dxx');
-spy(Dxx);
-subplot 142
-title('Dxy');
-spy(Dxy);
-subplot 143
-title('Gxx');
-spy(Gxx);
-subplot 144
-title('Gxy');
-spy(Gxy);
+﻿fig, (ax1, ax2, ax3, ax4) = subplots(1, 4,figsize=(20,7));
+ax1.set_title('D');
+ax1.spy(D);
+
+ax2.set_title('Edot');
+ax2.spy(Edot);
+
+ax3.set_title('A');
+ax3.spy(A);
+
+ax4.set_title('L, nz={L.nnz}');
+ax4.spy(L);
  

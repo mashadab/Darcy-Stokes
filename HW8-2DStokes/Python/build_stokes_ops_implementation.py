@@ -46,25 +46,19 @@ A  = 2.0 * mu * D @ Edot
 L  = bmat([[A, -Gp], [Dp, None]],format="csr")
 fs = csr_matrix((Grid.N, 1), dtype=np.float64)
 
-#Boundary conditions
-if 'lid_driven_cavity_flow' in simulation_type:
-    Grid.dof_no_pene = np.concatenate((Grid.Vx.dof_xmin, Grid.Vx.dof_xmax, Grid.Vx.N+Grid.Vy.dof_ymin , Grid.Vx.N+Grid.Vy.dof_ymax))
-    Grid.N_no_pene   = np.shape(Grid.dof_no_pene)
-    BC.dof_dir =  np.array([np.concatenate((Grid.dof_no_pene, Grid.Vx.dof_ymax[1:len(Grid.Vx.dof_ymax)-1] , [Grid.p.Nf+1]))])
-                                #set x_max x-vel  set x_min x-vel     set y_min y-vel               set y_max y-vel          set pressure
-    BC.g = np.transpose([np.concatenate((np.zeros(Grid.N_no_pene), np.ones(Grid.p.Nx-1),[0.0]))])
 
-else:#no flow
-    BC.dof_dir =  np.array([np.concatenate((Grid.Vx.dof_xmax , Grid.Vx.dof_xmin, Grid.Vx.N+Grid.Vy.dof_ymin , Grid.Vx.N+Grid.Vy.dof_ymax, [Grid.p.Nf+1]))])
-                                #set x_max x-vel  set x_min x-vel     set y_min y-vel               set y_max y-vel          set pressure
-    BC.g = 0.0*np.zeros((np.shape(BC.dof_dir)[1],1))  
+## Plotting the solution
+fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4,figsize=(20,7))
+ax1.set_title(f'D, nz={D.nnz}')
+ax1.spy(D)
 
-BC.dof_neu = np.array([])
-[B,N,fn] = build_bnd(BC,Grid,I)
+ax2.set_title(f'Edot, nz={Edot.nnz}')
+ax2.spy(Edot)
 
-#Solving for Stokes flow
-u = solve_lbvp(L,fs+fn,B,BC.g,N)
-v = u[:Grid.p.Nf,:]; p = u[Grid.p.Nf+1:,:] #Extracting velocity and pressure inside
+ax3.set_title(f'A, nz={A.nnz}')
+ax3.spy(A)
 
-#Plotting
-quiver_plot(simulation_name,Grid,v)
+ax4.set_title(f'L, nz={L.nnz}')
+ax4.spy(L)
+
+plt.tight_layout()
