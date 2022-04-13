@@ -44,15 +44,11 @@ fs = csr_matrix((Grid.N, 1), dtype=np.float64)
 
 #Boundary conditions
 if 'lid_driven_cavity_flow' in simulation_type:
-    #Grid.dof_no_pene = np.concatenate((Grid.Vx.dof_xmin, Grid.Vx.dof_xmax, Grid.Vx.N+Grid.Vy.dof_ymin , Grid.Vx.N+Grid.Vy.dof_ymax))
-    #Grid.N_no_pene   = np.shape(Grid.dof_no_pene)
-    BC.dof_dir =  np.concatenate((Grid.dof_pene, Grid.Vx.dof_ymax[1:len(Grid.Vx.dof_ymax)-1] , Grid.dof_pc-1))
-                                #set x_max x-vel  set x_min x-vel     set y_min y-vel               set y_max y-vel          set pressure
+    BC.dof_dir =  np.concatenate((Grid.dof_pene, Grid.Vx.dof_ymax[1:len(Grid.Vx.dof_ymax)-1] , Grid.dof_pc))
     BC.g = np.transpose([np.concatenate((np.zeros(Grid.N_pene), np.ones(Grid.p.Nx-1),[0.0]))])
 
 else:#no flow
-    BC.dof_dir =  np.concatenate((Grid.dof_solid_bnd-1, Grid.dof_pc-1))
-                                #set x_max x-vel  set x_min x-vel     set y_min y-vel               set y_max y-vel          set pressure
+    BC.dof_dir =  np.concatenate((Grid.dof_solid_bnd, Grid.dof_pc))
     BC.g        = np.concatenate((np.zeros(Grid.N_solid_bnd), [0.0]))  
 
 BC.dof_neu = np.array([])
