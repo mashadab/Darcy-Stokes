@@ -47,6 +47,8 @@ A  = 2.0 * mu * D @ Edot
 L  = bmat([[A, -Gp], [Dp, None]],format="csr")
 fs = csr_matrix((Grid.N, 1), dtype=np.float64)
 
+
+'''
 #Boundary conditions
 if 'lid_driven_cavity_flow' in simulation_type:
     Grid.dof_no_pene = np.concatenate((Grid.Vx.dof_xmin, Grid.Vx.dof_xmax, Grid.Vx.N+Grid.Vy.dof_ymin , Grid.Vx.N+Grid.Vy.dof_ymax))
@@ -69,3 +71,4 @@ v = u[:Grid.p.Nf,:]; p = u[Grid.p.Nf+1:,:] #Extracting velocity and pressure ins
 
 #Plotting
 quiver_plot(simulation_name,Grid,v)
+'''
