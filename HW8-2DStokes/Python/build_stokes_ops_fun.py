@@ -3,17 +3,20 @@
 # email: mashadab@utexas.edu
 # date: 02/12/2021
 
+import sys
+sys.path.insert(1, '../../HW6-2D_operators/Python/')
+
 import numpy as np
-from build_opsfun2D_optimized import build_ops
+from build_opsfun2D_latest import build_ops
 from scipy.sparse import eye, bmat
 import matplotlib.pyplot as plt
 
 def build_stokes_ops(Grid):
     
     #Operator for pressure Grid, x-velocity, and y-velocity.
-    [Dp ,Gp, Ip]  = build_ops(Grid.p)     
-    [DVx,GVx,IVx] = build_ops(Grid.Vx) 
-    [DVy,GVy,IVy] = build_ops(Grid.Vy)  
+    [Dp ,Gp,  _, Ip,  _] = build_ops(Grid.p)     
+    [DVx,GVx, _, IVx, _] = build_ops(Grid.Vx) 
+    [DVy,GVy, _, IVy, _] = build_ops(Grid.Vy)  
 
     #Extracting the gradient operator
     GVxx = GVx[0:Grid.Vx.Nfx,:] ; GVxy = GVx[Grid.Vx.Nfx:Grid.Vx.Nf,:] 

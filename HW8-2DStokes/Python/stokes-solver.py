@@ -17,15 +17,8 @@ import matplotlib.pyplot as plt
 from classfun import *  #importing the classes and relevant functions
 from build_stokes_grid_fun import build_stokes_grid
 from build_stokes_ops_fun import build_stokes_ops
-
-from comp_algebraicmean_optimized import comp_algebraic_mean
-from comp_harmonicmean import comp_harmonicmean
-from mobilityfun import mobility
 from build_bndfun_optimized import build_bnd
 from solve_lbvpfun_optimized import solve_lbvp
-from flux_upwindfun2D_optimized import flux_upwind  #instead of from adv_opfun2D import adv_opfun
-from time import perf_counter
-from eval_phase_behavior import eval_phase_behavior, enthalpyfromT
 from quiver_plot import quiver_plot
 
 #problem parameter
@@ -48,19 +41,19 @@ L  = bmat([[A, -Gp], [Dp, None]],format="csr")
 fs = csr_matrix((Grid.N, 1), dtype=np.float64)
 
 
-'''
+
 #Boundary conditions
 if 'lid_driven_cavity_flow' in simulation_type:
-    Grid.dof_no_pene = np.concatenate((Grid.Vx.dof_xmin, Grid.Vx.dof_xmax, Grid.Vx.N+Grid.Vy.dof_ymin , Grid.Vx.N+Grid.Vy.dof_ymax))
-    Grid.N_no_pene   = np.shape(Grid.dof_no_pene)
-    BC.dof_dir =  np.array([np.concatenate((Grid.dof_no_pene, Grid.Vx.dof_ymax[1:len(Grid.Vx.dof_ymax)-1] , [Grid.p.Nf+1]))])
+    #Grid.dof_no_pene = np.concatenate((Grid.Vx.dof_xmin, Grid.Vx.dof_xmax, Grid.Vx.N+Grid.Vy.dof_ymin , Grid.Vx.N+Grid.Vy.dof_ymax))
+    #Grid.N_no_pene   = np.shape(Grid.dof_no_pene)
+    BC.dof_dir =  np.concatenate((Grid.dof_pene, Grid.Vx.dof_ymax[1:len(Grid.Vx.dof_ymax)-1] , Grid.dof_pc-1))
                                 #set x_max x-vel  set x_min x-vel     set y_min y-vel               set y_max y-vel          set pressure
-    BC.g = np.transpose([np.concatenate((np.zeros(Grid.N_no_pene), np.ones(Grid.p.Nx-1),[0.0]))])
+    BC.g = np.transpose([np.concatenate((np.zeros(Grid.N_pene), np.ones(Grid.p.Nx-1),[0.0]))])
 
 else:#no flow
-    BC.dof_dir =  np.array([np.concatenate((Grid.Vx.dof_xmax , Grid.Vx.dof_xmin, Grid.Vx.N+Grid.Vy.dof_ymin , Grid.Vx.N+Grid.Vy.dof_ymax, [Grid.p.Nf+1]))])
+    BC.dof_dir =  np.concatenate((Grid.dof_solid_bnd-1, Grid.dof_pc-1))
                                 #set x_max x-vel  set x_min x-vel     set y_min y-vel               set y_max y-vel          set pressure
-    BC.g = 0.0*np.zeros((np.shape(BC.dof_dir)[1],1))  
+    BC.g        = np.concatenate((np.zeros(Grid.N_solid_bnd), [0.0]))  
 
 BC.dof_neu = np.array([])
 [B,N,fn] = build_bnd(BC,Grid,I)
@@ -71,4 +64,3 @@ v = u[:Grid.p.Nf,:]; p = u[Grid.p.Nf+1:,:] #Extracting velocity and pressure ins
 
 #Plotting
 quiver_plot(simulation_name,Grid,v)
-'''
