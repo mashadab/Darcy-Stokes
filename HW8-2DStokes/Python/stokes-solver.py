@@ -30,7 +30,7 @@ Gridp.ymin = 0.0 ; Gridp.ymax = 1 ; Gridp.Ny   = 5
 Grid = build_stokes_grid(Gridp)
 
 #simulation name
-simulation_type = 'lid_driven_cavity_flow'   #lid_driven_cavity_flow or 'no_flow' 
+simulation_type = 'lid_driven_cavity_flow_with_no_slip'   #lid_driven_cavity_flow_with_slip or 'no_flow' 
 simulation_name = f'stokes_solver_test{simulation_type}_domain{Gridp.xmax-Gridp.xmin}by{Gridp.ymax-Gridp.ymin}_N{Gridp.Nx}by{Gridp.Ny}'
 
 #building operators
@@ -43,7 +43,12 @@ fs = csr_matrix((Grid.N, 1), dtype=np.float64)
 
 
 #Boundary conditions
-if 'lid_driven_cavity_flow' in simulation_type:
+if 'lid_driven_cavity_flow_with_slip' in simulation_type:
+    BC.dof_dir =  np.concatenate((Grid.dof_pene, Grid.Vx.dof_ymax[1:len(Grid.Vx.dof_ymax)-1] , Grid.dof_pc))
+    BC.g = np.transpose([np.concatenate((np.zeros(Grid.N_pene), np.ones(Grid.p.Nx-1),[0.0]))])
+    
+elif 'lid_driven_cavity_flow_with_no_slip' in simulation_type: #did not work
+    dof_with_no_slip = np.setdiff1d(Grid.dof_slip,Grid.Vx.dof_ymax[1:len(Grid.Vx.dof_ymax)-1])
     BC.dof_dir =  np.concatenate((Grid.dof_pene, Grid.Vx.dof_ymax[1:len(Grid.Vx.dof_ymax)-1] , Grid.dof_pc))
     BC.g = np.transpose([np.concatenate((np.zeros(Grid.N_pene), np.ones(Grid.p.Nx-1),[0.0]))])
 
