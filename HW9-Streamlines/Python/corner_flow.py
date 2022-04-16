@@ -54,10 +54,16 @@ if 'lid_driven_cavity_flow_with_slip' in simulation_type:
     
 elif 'lid_driven_cavity_flow_with_no_slip' in simulation_type: #did not work
     BC.dof_dir =  np.concatenate((Grid.dof_pene, \
-                                  Grid.dof_ymax_vt,\
+                                  Grid.dof_ymax_vt[1:-1],\
+                                  Grid.dof_ymin_vt[1:-1],\
+                                  Grid.dof_xmax_vt[1:-1],\
+                                  Grid.dof_xmin_vt[1:-1],\
                                   Grid.dof_pc))
     BC.g = np.transpose([np.concatenate((np.zeros(Grid.N_pene), \
-                                         np.ones(len(Grid.dof_ymax_vt)),\
+                                         np.ones(len(Grid.dof_ymax_vt[1:-1])),\
+                                         np.zeros(len(Grid.dof_ymin_vt[1:-1])),\
+                                         np.zeros(len(Grid.dof_xmax_vt[1:-1])),\
+                                         np.zeros(len(Grid.dof_xmin_vt[1:-1])),\
                                         [0.0]))])
 
 else:#no flow
