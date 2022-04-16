@@ -21,13 +21,15 @@ from build_stokes_ops_fun import build_stokes_ops
 from build_bndfun_optimized import build_bnd
 from solve_lbvpfun_optimized import solve_lbvp
 from quiver_plot import quiver_plot
+from comp_streamfun import comp_streamfun
+from plot_streamlines import plot_streamlines
 
 #problem parameter
 mu  = 1.0  #Viscosity nondimensionalized 
 
 #building grid
-Gridp.xmin = 0.0 ; Gridp.xmax = 1 ; Gridp.Nx   = 5
-Gridp.ymin = 0.0 ; Gridp.ymax = 1 ; Gridp.Ny   = 5
+Gridp.xmin = 0.0 ; Gridp.xmax = 1 ; Gridp.Nx   = 100
+Gridp.ymin = 0.0 ; Gridp.ymax = 1 ; Gridp.Ny   = 100
 Grid = build_stokes_grid(Gridp)
 
 #simulation name
@@ -78,6 +80,8 @@ BC.dof_neu = np.array([])
 #Solving for Stokes flow
 u = solve_lbvp(L,fs+fn,B,BC.g,N)
 v = u[:Grid.p.Nf,:]; p = u[Grid.p.Nf+1:,:] #Extracting velocity and pressure inside
+[PSI,psi_min,psi_max] = comp_streamfun(v,Gridp)
 
 #Plotting
-quiver_plot(simulation_name,Grid,v)
+#quiver_plot(simulation_name,Grid,v)
+plot_streamlines(simulation_name,Grid,v,PSI,psi_min,psi_max,'label_no')

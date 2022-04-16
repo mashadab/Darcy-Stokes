@@ -17,12 +17,8 @@ def comp_streamfun(q,Grid):
     
     # Integrate horizontally along ymin boundary first then vertically into the domain.
     Qymin = np.vstack([0, np.cumsum(q[Grid.dof_f_ymin-1,:]*Grid.A[Grid.dof_f_ymin-1,:],axis=1)])  # Integral of flow into ymin boundary, this is a vector
-    print(Qymin)
-    print(np.shape(Qymin))
-    '''
-    Qx = reshape(q(1:Grid.Nfx).*Grid.A(1:Grid.Nfx),Grid.Ny,Grid.Nx+1) # Horizontal fluxes in Ny by Nx+1 matrix
-    PSI = cumsum([-Qymin;Qx],1); # integrals into domain with Qymin as initial value
-    psi_min = min(PSI(:));  psi_max = max(PSI(:))
-    '''
-    
-    return #PSI,psi_min,psi_max
+    Qx = np.transpose((q[0:Grid.Nfx,:]*Grid.A[0:Grid.Nfx,:]).reshape(Grid.Nx+1,Grid.Ny))
+    PSI = np.cumsum(np.vstack([-Qymin.T,Qx]),axis=0); # integrals into domain with Qymin as initial value
+    psi_min = np.min(PSI);  psi_max = np.max(PSI)
+
+    return PSI,psi_min,psi_max

@@ -18,7 +18,7 @@ BC.dof_dir = [Grid.dof_ymax_vt(2:end-1);...  % tangential velocity on the top
               Grid.dof_xmin_vt(2:end-1);...  
               Grid.dof_xmax_vt(2:end-1);...  
               Grid.dof_pc];         % pressure constraint
-          
+BC.dof_f_dir = [];         
 BC.g       = [ones(length(Grid.dof_ymax_vt(2:end-1)),1);...       % tangential velocity on the top
               zeros(Grid.N_pene,1);...      % no penetration on all bnd's
               zeros(length(Grid.dof_ymin_vt(2:end-1)),1);...  
@@ -35,7 +35,7 @@ PSI = comp_streamfun(v,Grid.p);
 %% Plot solution
 [Xp,Yp] = meshgrid(Grid.x.xc,Grid.y.yc);
 psi_max = max(PSI(:));
-contour(Xp,Yp,PSI,20,'k'), hold on
+contour(Xp,Yp,PSI,100,'k'), hold on
 contour(Xp,Yp,PSI,psi_max*[.2:.2:1],'r-')
 legend('main circulation','corner eddies','location','south')
 axis square
