@@ -32,7 +32,7 @@ def comp_mean(K,M,p,Grid,kvkh): # repo MDOT
     # [D,G,C,I,M] = build_ops(Grid);
     # Kd = comp_mean(K(Grid.xc),M,1,Grid,1);
     
-    Kmean = (M*K**p)**(1/p);                   # Compute general power mean
+    Kmean = (M @ K**p)**(1/p);                   # Compute general power mean
     
     if Grid.Ny == 1:
         Kd = sp.spdiags(Kmean,0,Grid.Nfx,Grid.Nfx);  # place on diagonal
