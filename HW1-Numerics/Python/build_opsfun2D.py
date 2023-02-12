@@ -95,6 +95,3 @@ def zero_rows(M, rows_to_zero):
     D = sp.diags(ixs)
     res = D * M
     return res
-
-
-
