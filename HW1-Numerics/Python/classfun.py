@@ -58,6 +58,10 @@ class BC:
             self.g = []             # column vector of non-homogeneous Dirichlet BCs (Nc X 1)
             self.qb = []     
                 
-        
+class Param:
+    def __init__(self):
+        self.xmin = []
+        self.xmax = []
+        self.Nx = []     
         
         

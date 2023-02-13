@@ -48,7 +48,7 @@ class analytical:
 #####################################################################################
 
 #parameters
-HD = 5  #dimensionless domain length
+HD = 0.1  #dimensionless domain length
 
 #building grid and operators
 Grid.xmin = 0; Grid.xmax = HD; Grid.Nx = 50

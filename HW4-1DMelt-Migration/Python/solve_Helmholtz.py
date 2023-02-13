@@ -37,17 +37,17 @@ def solve_Helmholtz(D,G,I,M,phi,n,m,Grid,B,N,fn,BC,Zc,Gamma): # class
     
     # Porosity matrices
     Phi_n = comp_mean(phi**n, M, -1, Grid, 1)
-    Phi_m = sp.spdiags(phi**m,0,Grid.N,Grid.N)
+    Phi_m = sp.spdiags((phi**m).T,0,Grid.N,Grid.N)
     
     #Solve modified Helmholtz equation
     L  = - D @ Phi_n @ G + Phi_m
-    fs =   Phi_m @ np.transpose([Zc]) + Gamma
+    fs =   Phi_m @ Zc + Gamma
     flux = lambda h: -Phi_n @ (G @ np.transpose([h]))
     res  = lambda h,cell: L[cell,:] @ np.transpose([h]) - fs[cell,:]
     
     #Solve boundary value problem
     hD =   solve_lbvp(L,fs+fn,B,BC.g,N)
     qD =   comp_flux_gen(flux,res,hD,Grid,BC)
-    pD =   hD - Zc
+    pD =   np.transpose([hD]) - Zc
 
     return hD,pD,qD;

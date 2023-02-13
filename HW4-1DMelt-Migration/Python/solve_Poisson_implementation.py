@@ -23,7 +23,6 @@ n_exp = 3
 m_exp = 1
 HD    = 30
 
-
 # Build grid and operator
 Grid.xmin = 0; Grid.xmax = HD; Grid.Nx = 350
 Grid        = build_grid(Grid)

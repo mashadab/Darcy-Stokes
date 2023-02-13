@@ -35,9 +35,9 @@ def comp_mean(K,M,p,Grid,kvkh): # repo MDOT
     Kmean = (M @ K**p)**(1/p);                   # Compute general power mean
     
     if Grid.Ny == 1:
-        Kd = sp.spdiags(Kmean,0,Grid.Nfx,Grid.Nfx);  # place on diagonal
+        Kd = sp.spdiags(Kmean.T,0,Grid.Nfx,Grid.Nfx);  # place on diagonal
     else:
-        Kd = sp.spdiags(Kmean,0,Grid.Nf,Grid.Nf);  # place on diagonal
+        Kd = sp.spdiags(Kmean.T,0,Grid.Nf,Grid.Nf);  # place on diagonal
     
     return Kd;
 

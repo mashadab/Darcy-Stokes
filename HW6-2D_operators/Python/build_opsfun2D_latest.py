@@ -52,7 +52,7 @@ def build_ops(Grid):
     # Note this is only true in cartesian coordinates!
     # For more general coordinate systems it is worth
     # assembling G and D seperately.
-    G = -sp.csr_matrix.transpose(D)
+    G = -D.T
     G =  zero_rows(G,dof_f_bnd)
 
     #Identity

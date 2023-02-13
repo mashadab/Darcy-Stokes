@@ -35,8 +35,8 @@ def build_bnd(Param,Grid,I):
     
     # Dirichlet boundary conditions
     if not Param.dof_dir.any():
-        B = []
-        N = []    
+        B = sp.csr_matrix([])
+        N = sp.csr_matrix([])    
     else:
         #if Grid.Nx>1 and Grid.Ny>1:
         #B = I[np.squeeze(Param.dof_dir-1, axis=0), :]   

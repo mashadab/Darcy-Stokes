@@ -44,8 +44,8 @@ def comp_flux_gen(flux,res,u,Grid,Param):
     #For non-empty Dirichlet and Neumann BC
     else:
         if Grid.Ny > 1:
-            dof_cell = np.concatenate((np.squeeze(Param.dof_dir, axis=0),np.squeeze(Param.dof_neu, axis=0)),axis=0)
-            dof_face = np.concatenate((np.squeeze(Param.dof_f_dir, axis=0),np.squeeze(Param.dof_f_neu, axis=0)),axis=0)
+            dof_cell = np.concatenate((np.ravel(Param.dof_dir),np.ravel(Param.dof_neu)),axis=0)
+            dof_face = np.concatenate((np.ravel(Param.dof_f_dir),np.ravel(Param.dof_f_neu)),axis=0)
         else:
             dof_cell = np.concatenate((Param.dof_dir,Param.dof_neu),axis=0)
             dof_face = np.concatenate((Param.dof_f_dir,Param.dof_f_neu),axis=0)

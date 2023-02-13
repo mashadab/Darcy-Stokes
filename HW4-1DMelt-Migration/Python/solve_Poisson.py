@@ -34,11 +34,11 @@ def solve_Poisson(D,G,I,phi,m,pD,Grid,B,N,fn,BC): # class
     # vD = Nf by 1 column vector of dimensionless solid velocities
     
     # Porosity matrices
-    Phi_m = sp.spdiags(phi**m,0,Grid.N,Grid.N)
+    Phi_m = sp.spdiags((phi**m).T,0,Grid.N,Grid.N)
     
     #Solve modified Helmholtz equation
     L  = - D @ G
-    fs =   Phi_m @ np.transpose([pD])
+    fs =   Phi_m @ pD
     flux = lambda u: -G @ np.transpose([u])
     res  = lambda u,cell: L[cell,:] @ np.transpose([u]) - fs[cell,:]
     
