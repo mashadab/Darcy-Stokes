@@ -18,9 +18,10 @@ Param.dtD = Param.tDmax/Param.Nt;
 Grid.xmin = 0; Grid.xmax = Param.LD; Grid.Nx = 200;
 Grid.ymin = 0; Grid.ymax = Param.HD; Grid.Ny = 100;
 
-Grid = build_grid(Grid);
-[D,G,C,I,M] = build_ops(Grid);
+Grid = build_grid2D(Grid);
+[D,G,C,I,M] = build_ops2D(Grid);
 [Xc,Zc] = meshgrid(Grid.xc,Grid.yc);
+Zc_col  = Zc(:);
 
 %% Define boundary conditions
 % 1) Helmholtz eqn.
@@ -53,7 +54,7 @@ BC.phi.qb        = [];
 %% Initial condition
 % This generates a near surface melt later with a sinusoudal perturbation
 % to accelearte the formation of the porosity waves.
-phiD = make_ic_class(Grid,Param,D,G,I,Zc);
+phiD = ones(Grid.N,1)+1e-1*randn(Grid.N,1);
 
 % Plot initial condition
 figure
@@ -72,7 +73,7 @@ tD = 0;
 for i = 1:Param.Nt
     tD = tD+Param.dtD;
     % Solve the problem
-    [hD,pD,qD] = solve_Helmholtz(D,G,I,M,phiD,Param.n,Param.m,Grid,B_h,N_h,fn_h,BC.h,Zc,0);
+    [hD,pD,qD] = solve_Helmholtz(D,G,I,M,phiD,Param.n,Param.m,Grid,B_h,N_h,fn_h,BC.h,Zc_col,0);
     [uD,vD]    = solve_Poisson(D,G,I,phiD,Param.m,pD,Grid,B_u,N_u,fn_u,BC.u);
     [phiD,Av]  = evolve_porosity(D,I,phiD,vD,pD,B_phi,N_phi,BC.phi,Grid,Param.phi_shell,Param.theta,Param.dtD);
 

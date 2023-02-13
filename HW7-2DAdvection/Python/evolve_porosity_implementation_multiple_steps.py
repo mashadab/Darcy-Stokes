@@ -40,7 +40,7 @@ Param.dtD   = Param.tDmax/Param.Nt
 
 # Build grid and operator
 Grid.xmin = 0; Grid.xmax = Param.HD; Grid.Nx = 200
-Grid.ymin = 0; Grid.ymax = Param.LD; Grid.Ny = 200
+Grid.ymin = 0; Grid.ymax = Param.LD; Grid.Ny = 100
 Grid        = build_grid(Grid)
 [Xc,Zc] = np.meshgrid(Grid.xc,Grid.yc)
 Xc_col  = np.reshape(np.transpose(Xc), (Grid.N,-1))
@@ -104,7 +104,7 @@ for i in range(1,Param.Nt):
     [phiD,Av]  = evolve_porosity(D,I,phiD,vD,pD,B_phi,N_phi,BC.phi,Grid,Param.phi_shell,Param.theta,.1)
     
     if i % Param.plot_interval ==0:
-        phi_D_sol = np.hstack([phi_D_sol,phiD])
+        phi_D_sol = np.hstack([phi_D_sol,np.array([phiD]).T])
         tD_sol.append(tD)
         print(i,tD)
 
