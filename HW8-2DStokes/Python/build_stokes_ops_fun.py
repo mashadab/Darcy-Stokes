@@ -18,10 +18,12 @@ def build_stokes_ops(Grid):
     [DVx,GVx, _, IVx, _] = build_ops(Grid.Vx) 
     [DVy,GVy, _, IVy, _] = build_ops(Grid.Vy)  
 
-    #Extracting the gradient operator
+    #Extracting the gradient operator 
+    GVx = GVx.tocsr(); GVy = GVy.tocsr(); 
     GVxx = GVx[0:Grid.Vx.Nfx,:] ; GVxy = GVx[Grid.Vx.Nfx:Grid.Vx.Nf,:] 
     GVyx = GVy[0:Grid.Vy.Nfx,:] ; GVyy = GVy[Grid.Vy.Nfx:Grid.Vy.Nf,:]     
 
+    DVx = DVx.tocsr(); DVy = DVy.tocsr();
     #Extracting the divergence operator
     DVxx = DVx[:,0:Grid.Vx.Nfx] ; DVxy = DVx[:,Grid.Vx.Nfx:Grid.Vx.Nf] 
     DVyx = DVy[:,0:Grid.Vy.Nfx] ; DVyy = DVy[:,Grid.Vy.Nfx:Grid.Vy.Nf]     

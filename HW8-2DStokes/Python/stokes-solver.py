@@ -25,8 +25,8 @@ from quiver_plot import quiver_plot
 mu  = 1.0  #Viscosity nondimensionalized 
 
 #building grid
-Gridp.xmin = 0.0 ; Gridp.xmax = 1 ; Gridp.Nx   = 5
-Gridp.ymin = 0.0 ; Gridp.ymax = 1 ; Gridp.Ny   = 5
+Gridp.xmin = 0.0 ; Gridp.xmax = 1 ; Gridp.Nx   = 50
+Gridp.ymin = 0.0 ; Gridp.ymax = 1 ; Gridp.Ny   = 50
 Grid = build_stokes_grid(Gridp)
 
 #simulation name
@@ -39,7 +39,6 @@ D, Edot, Dp, Gp, I = build_stokes_ops(Grid)
 A  = 2.0 * mu * D @ Edot
 L  = bmat([[A, -Gp], [Dp, None]],format="csr")
 fs = csr_matrix((Grid.N, 1), dtype=np.float64)
-
 
 
 #Boundary conditions
