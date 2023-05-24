@@ -27,7 +27,7 @@ from plot_streamlines import plot_streamlines
 
 #problem parameter
 mu_max  = 1.0  #Viscosity nondimensionalized 
-n       = 0    #n=0 for constant viscosity, or n = 1
+n       = 1    #n=0 for constant viscosity, or n = 1
 
 #building grid
 Gridp.xmin = 0.0 ; Gridp.xmax = 1 ; Gridp.Nx   = 100
@@ -36,7 +36,7 @@ Grid = build_stokes_grid(Gridp)
 [Xc,Yc] = np.meshgrid(Gridp.xc,Gridp.yc)
 Xc_col = np.reshape(Xc.T,(Gridp.N,-1)); Yc_col = np.reshape(Yc.T,(Gridp.N,-1))
 
-mu_c   = mu_max * (1-Yc_col / Gridp.ymax)**n  #Linearly varying viscosity with depth
+mu_c   = mu_max * (Yc_col / Gridp.ymax)**n  #Linearly varying viscosity with depth
 
 #simulation name
 simulation_type = 'lid_driven_cavity_flow_with_no_slip'   #lid_driven_cavity_flow_with_slip or 'no_flow' 
@@ -93,3 +93,8 @@ v = u[:Grid.p.Nf,:]; p = u[Grid.p.Nf+1:,:] #Extracting velocity and pressure ins
 #Plotting
 #quiver_plot(simulation_name,Grid,v)
 plot_streamlines(simulation_name,Grid,v,PSI,psi_min,psi_max,'label_no')
+
+
+plt.figure()
+plt.contourf(Xc,Yc,np.transpose((mu_c).reshape(Gridp.Nx,Gridp.Ny)))
+plt.colorbar()

@@ -1,5 +1,5 @@
 mu_max = 1.0; %Maximum viscosity
-n      = 0  ; %n = 0 for constant viscosity, n=1 for variable viscosity  
+n      = 1  ; %n = 0 for constant viscosity, n=1 for variable viscosity  
 
 %% Build staggered grids
 Gridp.xmin = 0; Gridp.xmax = 1; Gridp.Nx = 100;
