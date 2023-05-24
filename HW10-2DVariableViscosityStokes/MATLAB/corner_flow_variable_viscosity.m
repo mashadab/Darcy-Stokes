@@ -1,4 +1,5 @@
-mu_max = 1.0;
+mu_max = 1.0; %Maximum viscosity
+n      = 0  ; %n = 0 for constant viscosity, n=1 for variable viscosity  
 
 %% Build staggered grids
 Gridp.xmin = 0; Gridp.xmax = 1; Gridp.Nx = 100;
@@ -6,7 +7,7 @@ Gridp.ymin = 0; Gridp.ymax = 1; Gridp.Ny = 100;
 Grid = build_stokes_grid(Gridp);
 [Xc,Yc] = meshgrid(Grid.p.xc,Grid.p.yc);
 
-mu = mu_max*(Yc(:)/Grid.p.ymax);  %linearly decaying viscosity with depth
+mu = mu_max*(Yc(:)/Grid.p.ymax).^n;  %linearly decaying viscosity with depth
 
 %% Build Stokes operators
 [D,Edot,Dp,Gp,Z,I,Ms] = build_stokes_ops_variable_visc(Grid);

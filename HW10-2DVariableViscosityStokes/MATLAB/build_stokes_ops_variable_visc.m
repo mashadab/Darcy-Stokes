@@ -20,7 +20,7 @@ Mxx = Mx(1:Grid.x.Nfx,:); Mxy = Mx(Grid.x.Nfx+1:Grid.x.Nf,:);
 Myx = My(1:Grid.y.Nfx,:); Myy = My(Grid.y.Nfx+1:Grid.y.Nf,:);
 Mc  = Mxy * Mpx; %Mean for cross terms 
 
-%Mean operator
+%Assemble Mean operator
 Iy = eye(Grid.p.Ny); Ix = eye(Grid.p.Nx); 
 
 Iyy = [Iy(1,:);Iy;Iy(end,:)];
