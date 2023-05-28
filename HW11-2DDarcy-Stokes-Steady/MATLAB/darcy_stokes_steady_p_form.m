@@ -3,23 +3,23 @@
 %Date: May 27, 2023
 
 %Parameters
-mu_max = 1e-3%1e14; %Maximum solid viscosity [Pa.s]
+mu_max = 1e14; %Maximum solid viscosity [Pa.s]
 phi_min= 0.2; phi_max= 0.7; %Minimum and Maximum solid porosities [-]
 G      = 1.0; %Coefficient in the bulk viscosity formulation [-]
 k0     = 5.6e-11; %Relative permeability [m^2] {Meyer and Hewitt, 2017}
 mu_f   = 1e-3;%Viscosity of the fluid [Pa.s]
 m      = 1;   %Power law coefficient in compaction viscosity = (G/phi^m * mu_s) [-]
 n      = 2;   %Power law coefficient in porosity permeability relationship k = k0*phi^n [-]
-rho_s  = 1e3; %Density of solid [kg/m^3]
-rho_f  = 1e3%917; %Density of fluid [kg/m^3]
-Gamma  = 0;   %Rate of melting [1/day]
+rho_s  = 917; %Density of solid [kg/m^3]
+rho_f  = 1e3; %Density of fluid [kg/m^3]
+Gamma  = 0;   %Rate of melting [kg/m^3-s]
 grav   = 9.81;   %Acceleration due to gravity []m/s^2]
 
-vt     = 1e-3;   %Tangential velocity [m/s]
+vt     = 1e-5;   %Tangential velocity [m/s]
 
 %% Build staggered grids
-Gridp.xmin = 0; Gridp.xmax = 1; Gridp.Nx = 100;
-Gridp.ymin = 0; Gridp.ymax = 1; Gridp.Ny = 100;
+Gridp.xmin = 0; Gridp.xmax = 1; Gridp.Nx = 5;
+Gridp.ymin = 0; Gridp.ymax = 1; Gridp.Ny = 4;
 Grid = build_stokes_grid(Gridp);
 [Xc,Yc] = meshgrid(Grid.p.xc,Grid.p.yc);
 
@@ -118,7 +118,7 @@ axis square
 subplot 144
 contour(Xp,Yp,PSI,50,'k'), hold on
 contour(Xp,Yp,PSIf,50,'b--')
-legend('solid','fluid','location','northoutside')
+legend('solid','fluid','location','southoutside')
 axis square
 xlabel('x','fontsize',14)
 ylabel('z','fontsize',14)
@@ -148,7 +148,7 @@ function F = build_RHS(phi,Kd,Grid,Mp,Dp,rho_f,rho_s,Gamma,grav)
     fv = (Mp*(rho_f*phi + rho_s*(1-phi))).*grav.* [zeros(Grid.Nfx,1); ones(Grid.Nfy,1)] ;
     
     %fp at cell centers
-    fp =-(rho_f - rho_s)/(rho_f * rho_s) * Gamma + Dp * Kd * rho_f * grav * [zeros(Grid.Nfx,1); ones(Grid.Nfy,1)];
+    fp =-(rho_f - rho_s)/(rho_f * rho_s) * Gamma + Dp * (Kd * rho_f * grav * [zeros(Grid.Nfx,1); ones(Grid.Nfy,1)]);
     
     F = [fv;fp];
 end

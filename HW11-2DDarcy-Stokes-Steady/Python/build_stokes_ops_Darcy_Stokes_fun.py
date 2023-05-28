@@ -7,11 +7,15 @@ import sys
 sys.path.insert(1, '../../HW6-2D_operators/Python/')
 
 import numpy as np
-from build_opsfun2D_latest import build_ops
+from build_opsfun_Radial import build_ops
 from scipy.sparse import eye, bmat, vstack, kron
 import matplotlib.pyplot as plt
 
-def build_stokes_ops_variable_visc(Grid):
+def build_stokes_ops_Darcy_Stokes(Grid):
+
+    Grid.p.geom  = Grid.p.geom;
+    Grid.Vx.geom = Grid.p.geom;
+    Grid.Vy.geom = Grid.p.geom;
     
     #Operator for pressure Grid, x-velocity, and y-velocity.
     [Dp ,Gp,  _, Ip,  Mp] = build_ops(Grid.p)     
@@ -71,4 +75,4 @@ def build_stokes_ops_variable_visc(Grid):
     '''
     
     
-    return D, Edot, Dp, Gp, I, Ms;
+    return D, Edot, Dp, Gp, I, Ms,Mp;

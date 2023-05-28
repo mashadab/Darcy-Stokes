@@ -23,7 +23,7 @@ def build_stokes_grid(Gridp):
     Grid.Vx.Ny   = Gridp.Ny
     
     Grid.Vx = build_grid(Grid.Vx)
-
+    
     # y-velocity Grid
     Grid.Vy.xmin = Gridp.xmin
     Grid.Vy.xmax = Gridp.xmax
@@ -33,7 +33,7 @@ def build_stokes_grid(Gridp):
     Grid.Vy.ymax = Gridp.ymax + 0.5*Gridp.dy
     Grid.Vy.Ny   = Gridp.Ny + 1
     
-    Grid.Vy = build_grid(Grid.Vy)    
+    Grid.Vy = build_grid(Grid.Vy)   
     
     # For an array of u, p
     Grid.N  = Grid.p.N + Grid.Vx.N + Grid.Vy.N
