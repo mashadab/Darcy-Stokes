@@ -9,15 +9,16 @@ sys.path.insert(1, '../../HW3-Hetero-Fluxes-NeuBC/Python/')
 sys.path.insert(1, '../../HW4-1DMelt-Migration/Python/')
 sys.path.insert(1, '../../HW6-2D_operators/Python/')
 sys.path.insert(1, '../../HW8-2DStokes/Python/')
+sys.path.insert(1, '../../HW9-Streamlines/Python/')
 
 # import Python libraries
-from scipy.sparse import bmat,csr_matrix
+from scipy.sparse import bmat,csr_matrix,spdiags
 import matplotlib.pyplot as plt
 
 # import personal libraries
 from classfun import *  #importing the classes and relevant functions
 from build_stokes_grid_fun import build_stokes_grid
-from build_stokes_ops_fun import build_stokes_ops
+from build_stokes_ops_variable_visc_fun import build_stokes_ops_variable_visc
 from build_bndfun_optimized import build_bnd
 from solve_lbvpfun_optimized import solve_lbvp
 from quiver_plot import quiver_plot
@@ -25,21 +26,28 @@ from comp_streamfun import comp_streamfun
 from plot_streamlines import plot_streamlines
 
 #problem parameter
-mu  = 1.0  #Viscosity nondimensionalized 
+mu_max  = 1.0  #Viscosity nondimensionalized 
+n       = 1    #n=0 for constant viscosity, or n = 1
 
 #building grid
-Gridp.xmin = 0.0 ; Gridp.xmax = 1 ; Gridp.Nx   = 50
-Gridp.ymin = 0.0 ; Gridp.ymax = 1 ; Gridp.Ny   = 50
+Gridp.xmin = 0.0 ; Gridp.xmax = 1 ; Gridp.Nx   = 100
+Gridp.ymin = 0.0 ; Gridp.ymax = 1 ; Gridp.Ny   = 100
 Grid = build_stokes_grid(Gridp)
+[Xc,Yc] = np.meshgrid(Gridp.xc,Gridp.yc)
+Xc_col = np.reshape(Xc.T,(Gridp.N,-1)); Yc_col = np.reshape(Yc.T,(Gridp.N,-1))
+
+mu_c   = mu_max * (Yc_col / Gridp.ymax)**n  #Linearly varying viscosity with depth
 
 #simulation name
 simulation_type = 'lid_driven_cavity_flow_with_no_slip'   #lid_driven_cavity_flow_with_slip or 'no_flow' 
 simulation_name = f'stokes_solver_test{simulation_type}_domain{Gridp.xmax-Gridp.xmin}by{Gridp.ymax-Gridp.ymin}_N{Gridp.Nx}by{Gridp.Ny}'
 
 #building operators
-D, Edot, Dp, Gp, I = build_stokes_ops(Grid)
+D, Edot, Dp, Gp, I, Ms = build_stokes_ops_variable_visc(Grid)
+Mud = spdiags((Ms @ mu_c).T,0,np.shape(Edot)[0],np.shape(Edot)[0])
 
-A  = 2.0 * mu * D @ Edot
+
+A  = 2.0 * D @ Mud @ Edot
 L  = bmat([[A, -Gp], [Dp, None]],format="csr")
 fs = csr_matrix((Grid.N, 1), dtype=np.float64)
 
@@ -85,3 +93,8 @@ v = u[:Grid.p.Nf,:]; p = u[Grid.p.Nf+1:,:] #Extracting velocity and pressure ins
 #Plotting
 #quiver_plot(simulation_name,Grid,v)
 plot_streamlines(simulation_name,Grid,v,PSI,psi_min,psi_max,'label_no')
+
+
+plt.figure()
+plt.contourf(Xc,Yc,np.transpose((mu_c).reshape(Gridp.Nx,Gridp.Ny)))
+plt.colorbar()
