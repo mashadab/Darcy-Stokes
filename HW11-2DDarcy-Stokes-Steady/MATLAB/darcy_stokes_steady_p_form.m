@@ -18,7 +18,7 @@ grav   = 9.81;   %Acceleration due to gravity []m/s^2]
 vt     = 1e-5;   %Tangential velocity [m/s]
 
 %% Build staggered grids
-Gridp.xmin = 0; Gridp.xmax = 1; Gridp.Nx = 5;
+Gridp.xmin = 0; Gridp.xmax = 1; Gridp.Nx = 4;
 Gridp.ymin = 0; Gridp.ymax = 1; Gridp.Ny = 4;
 Grid = build_stokes_grid(Gridp);
 [Xc,Yc] = meshgrid(Grid.p.xc,Grid.p.yc);
@@ -27,7 +27,7 @@ Grid = build_stokes_grid(Gridp);
 
 %Initial condition
 mu = mu_max*ones(size(Yc(:)));  %This will be a function of temperature later but is constant right now
-phi= phi_min * ones(Grid.p.N,1); %+ (phi_max - phi_min)*(Yc(:)/Grid.p.ymax);  %Decays with depth
+phi= phi_min * ones(Grid.p.N,1);%+ (phi_max - phi_min)*(Yc(:)/Grid.p.ymax);  %Decays with depth
 
 %% Build Stokes operators
 [D,Edot,Dp,Gp,Z,I,Ms,Mp] = build_stokes_ops_Darcy_Stokes(Grid);
@@ -35,8 +35,8 @@ phi= phi_min * ones(Grid.p.N,1); %+ (phi_max - phi_min)*(Yc(:)/Grid.p.ymax);  %D
 %Evaluating different means
 %Mud = comp_mean(mu,Ms,-1,Grid.p,1); %Average viscosity
 Mud =  spdiags(Ms * (mu .* (1-phi)), 0, length(Edot),length(Edot));
-Zd = build_Zd(G,phi,m,mu,Grid.p);
-Kd = build_Kd(k0,n,phi,mu_f,Grid.p,Mp); 
+Zd  = build_Zd(G,phi,m,mu,Grid.p);
+Kd  = build_Kd(k0,n,phi,mu_f,Grid.p,Mp); 
 
 A = D*2*Mud*Edot;
 L = [A + Gp*Zd*Dp,  -Gp;...

@@ -63,7 +63,7 @@ grav   = 9.81#Acceleration due to gravity []m/s^2]
 vt     = 1e-5#Tangential velocity [m/s]
 
 #building grid
-Gridp.xmin = 0.0 ; Gridp.xmax = 1 ; Gridp.Nx   = 5
+Gridp.xmin = 0.0 ; Gridp.xmax = 1 ; Gridp.Nx   = 4
 Gridp.ymin = 0.0 ; Gridp.ymax = 1 ; Gridp.Ny   = 4
 Gridp.geom = 'cartesian'
 Grid = build_stokes_grid(Gridp)
@@ -72,7 +72,7 @@ Xc_col = np.reshape(Xc.T,(Gridp.N,-1)); Yc_col = np.reshape(Yc.T,(Gridp.N,-1))
 
 #Initial condition
 mu = mu_max  * np.ones_like(Yc_col)  #Constt viscosity
-phi = phi_min * np.ones((Grid.p.N,1)) #+ (phi_max - phi_min)*(Yc(:)/Grid.p.ymax);  #Constt porosity or Decays with depth
+phi= phi_min * np.ones((Grid.p.N,1)) #+ (phi_max - phi_min)*(Yc(:)/Grid.p.ymax);  #Constt porosity or Decays with depth
 
 
 #simulation name
@@ -86,7 +86,7 @@ Zd = build_Zd(G,phi,m,mu,Grid.p)
 Kd = build_Kd(k0,n,phi,mu_f,Grid.p,Mp)
 
 A  = 2.0 * D @ Mud @ Edot
-L  = bmat([[A + Gp*Zd*Dp, -Gp], [Dp, -Dp*Kd*Gp]],format="csr")
+L  = bmat([[A + Gp @ Zd @ Dp, -Gp], [Dp, -Dp @ Kd @ Gp]],format="csr")
 #fs = csr_matrix((Grid.N, 1), dtype=np.float64)
 fs = build_RHS(phi,Kd,Grid.p,Mp,Dp,rho_f,rho_s,Gamma,grav)
 
@@ -107,7 +107,7 @@ elif 'lid_driven_cavity_flow_with_no_slip' in simulation_type: #did not work
                                   Grid.dof_ymin_vt[1:-1],\
                                   Grid.dof_xmax_vt[1:-1],\
                                   Grid.dof_xmin_vt[1:-1],\
-                                  Grid.dof_pc))
+                                  Grid.dof_pc-1))
     BC.g = np.transpose([np.concatenate((np.zeros(Grid.N_pene), \
                                          vt*np.ones(len(Grid.dof_ymax_vt[1:-1])),\
                                          np.zeros(len(Grid.dof_ymin_vt[1:-1])),\

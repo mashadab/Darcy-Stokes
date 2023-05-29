@@ -64,27 +64,33 @@ def build_ops(Grid):
     #Curl matrix 
     C = []
     
+    constant  = 1 # = 0 for no flow BC , =1 for copying last value
+    
     #Algebraic mean  
     if Grid.Nx>1 and Grid.Ny==1:
         #Averaging in x-direction considering the zero-flux at boundary
         Avg_x1 = sp.spdiags(([np.array(0.5*np.ones((Grid.Nx),'float64')),0.5*np.array(np.ones((Grid.Nx),'float64'))]),np.array([0,1]),Grid.Nx-1,Grid.Nx)
-        Avg_x1 = sp.vstack([np.zeros((1,Grid.Nx)),Avg_x1, np.zeros((1,Grid.Nx))])         
+        Avg_x1 = sp.vstack([np.zeros((1,Grid.Nx)),Avg_x1, np.zeros((1,Grid.Nx))]).tocsr()  
+        Avg_x1[0,0] = constant; Avg_x1[Nx+1-1,Nx-1] = constant
         M      = Avg_x1.copy()
         
     elif Grid.Nx==1 and Grid.Ny>1:
         Avg_y1 = sp.spdiags(([np.array(0.5*np.ones((Grid.Ny),'float64')),0.5*np.array(np.ones((Grid.Ny),'float64'))]),np.array([0,1]),Grid.Ny-1,Grid.Ny)
-        Avg_y1 = sp.vstack([np.zeros((1,Grid.Ny)),Avg_y1,np.zeros((1,Grid.Ny))]) 
+        Avg_y1 = sp.vstack([np.zeros((1,Grid.Ny)),Avg_y1,np.zeros((1,Grid.Ny))]).tocsr()
+        Avg_y1[0,0] = constant; Avg_y1[Ny+1-1,Ny-1] = constant
         M      = Avg_y1.copy()     
     
     elif Grid.Nx>1 and Grid.Ny>1:
         #Averaging in y-direction considering the zero-flux at boundary
         Avg_y1 = sp.spdiags(([np.array(0.5*np.ones((Grid.Ny),'float64')),0.5*np.array(np.ones((Grid.Ny),'float64'))]),np.array([0,1]),Grid.Ny-1,Grid.Ny)
-        Avg_y1 = sp.vstack([np.zeros((1,Grid.Ny)),Avg_y1,np.zeros((1,Grid.Ny))]) 
+        Avg_y1 = sp.vstack([np.zeros((1,Grid.Ny)),Avg_y1,np.zeros((1,Grid.Ny))]).tocsr() 
+        Avg_y1[0,0] = constant; Avg_y1[Ny+1-1,Ny-1] = constant
         Avg_y2 = sp.kron(sp.eye(Grid.Nx),Avg_y1)
     
         #Averaging in x-direction considering the zero-flux at boundary
         Avg_x1 = sp.spdiags(([np.array(0.5*np.ones((Grid.Nx),'float64')),0.5*np.array(np.ones((Grid.Nx),'float64'))]),np.array([0,1]),Grid.Nx-1,Grid.Nx)
-        Avg_x1 = sp.vstack([np.zeros((1,Grid.Nx)),Avg_x1, np.zeros((1,Grid.Nx))]) 
+        Avg_x1 = sp.vstack([np.zeros((1,Grid.Nx)),Avg_x1, np.zeros((1,Grid.Nx))]).tocsr() 
+        Avg_x1[0,0] = constant; Avg_x1[Nx+1-1,Nx-1] = constant
         Avg_x2 = sp.kron(Avg_x1,sp.eye(Grid.Ny))         
         M      = sp.vstack([Avg_x2, Avg_y2])
  
