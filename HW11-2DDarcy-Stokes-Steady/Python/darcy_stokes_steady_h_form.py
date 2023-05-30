@@ -38,12 +38,12 @@ def build_Kd(k0,n,phi,mu_f,Grid,Mp): #building Kd at cell faces
 
 def build_RHS(phi,Kd,Grid,Mp,Dp,rho_f,rho_s,Gamma,grav):
     #fv at cell faces
-    fv = grav*( Mp @ (rho_f*phi + rho_s*(1-phi))) * np.vstack([np.zeros((Grid.Nfx,1)),np.ones((Grid.Nfy,1))])
+    fv =-grav*( Mp @ ((rho_f - rho_s) *(1-phi))) * np.vstack([np.zeros((Grid.Nfx,1)),np.ones((Grid.Nfy,1))])
     
-    #fp at cell centers
-    fp =-(rho_f - rho_s)/(rho_f * rho_s) * Gamma * np.ones((Grid.N,1)) + rho_f * grav * Dp @ (Kd @ np.vstack([np.zeros((Grid.Nfx,1)),np.ones((Grid.Nfy,1))]))
+    #fh at cell centers
+    fh =-(rho_f - rho_s)/(rho_f * rho_s) * Gamma * np.ones((Grid.N,1))
     
-    F =  np.vstack([fv,fp])
+    F =  np.vstack([fv,fh])
     
     return F
 
@@ -59,7 +59,7 @@ rho_s  = 917 #Density of solid [kg/m^3]
 rho_f  = 1e3 #Density of fluid [kg/m^3]
 Gamma  = 0   #Rate of melting [kg/m^3-s]
 grav   = 9.81#Acceleration due to gravity []m/s^2]
-
+Delta_rho = rho_f - rho_s #Density difference between the two phases [kg/m^3]
 vt     = 1e-5#Tangential velocity [m/s]
 
 #building grid
@@ -86,7 +86,7 @@ Zd = build_Zd(G,phi,m,mu,Grid.p)
 Kd = build_Kd(k0,n,phi,mu_f,Grid.p,Mp)
 
 A  = 2.0 * D @ Mud @ Edot
-L  = bmat([[A + Gp @ Zd @ Dp, -Gp], [Dp, -Dp @ Kd @ Gp]],format="csr")
+L  = bmat([[A + Gp @ Zd @ Dp, -(Delta_rho * grav)* Gp], [Dp, -(Delta_rho * grav)* Dp @ Kd @ Gp]],format="csr")
 #fs = csr_matrix((Grid.N, 1), dtype=np.float64)
 fs = build_RHS(phi,Kd,Grid.p,Mp,Dp,rho_f,rho_s,Gamma,grav)
 
@@ -126,10 +126,13 @@ BC.dof_neu = np.array([])
 
 #Solving for Stokes flow
 u = solve_lbvp(L,fs+fn,B,BC.g,N)
-v = u[:Grid.p.Nf,:]; p = u[Grid.p.Nf:,:]       #Extracting solid velocity and fluid pressure
+v = u[:Grid.p.Nf,:]; h = u[Grid.p.Nf:,:]       #Extracting solid velocity and fluid pressure
 [PSI,psi_min,psi_max] = comp_streamfun(v,Gridp)#Solid velocity stream function
 
-ps= p - G * mu/ phi**m * (Dp @ v)              #Solid pressure
+p = Delta_rho * grav * (h - Yc_col)           #Overpressure [Pa] 
+pf= p - rho_s * grav * Yc_col                 #Fluid pressure [Pa]
+ps= pf- G * mu/ phi**m * (Dp @ v)             #Solid pressure [Pa]
+
 #Fluid velocity
 vf = v - spdiags((1./(Mp @ phi)).T,0,Grid.p.Nf,Grid.p.Nf) @ Kd @ (Gp @ p + rho_f * grav * np.vstack([np.zeros((Grid.p.Nfx,1)),np.ones((Grid.p.Nfy,1))]))
 [PSIf,psif_min,psif_max] = comp_streamfun(vf,Gridp) #Fluid velocity stream function
@@ -152,16 +155,16 @@ plt.colorbar()
 plt.axis('scaled')
 
 ax2 = plt.subplot(1, 4, 2)
-plt.contourf(Xc,Yc,np.transpose((p).reshape(Gridp.Nx,Gridp.Ny)),100)
+plt.contourf(Xc,Yc,np.transpose((pf).reshape(Gridp.Nx,Gridp.Ny)),100)
 plt.colorbar()
-plt.contour(Xc,Yc,np.transpose((p).reshape(Gridp.Nx,Gridp.Ny)),50,colors='k')
+plt.contour(Xc,Yc,np.transpose((pf).reshape(Gridp.Nx,Gridp.Ny)),50,colors='k')
 plt.title('Fluid Pressure [Pa]')
 plt.axis('scaled')
 
 ax3 = plt.subplot(1, 4, 3)
-plt.contourf(Xc,Yc,np.transpose((p + rho_s * grav * Yc_col).reshape(Gridp.Nx,Gridp.Ny)),100)
+plt.contourf(Xc,Yc,np.transpose((p).reshape(Gridp.Nx,Gridp.Ny)),100)
 plt.colorbar()
-plt.contour(Xc,Yc,np.transpose((p + rho_s * grav * Yc_col).reshape(Gridp.Nx,Gridp.Ny)),50,colors='k')
+plt.contour(Xc,Yc,np.transpose((p).reshape(Gridp.Nx,Gridp.Ny)),50,colors='k')
 plt.title('Overpressure [Pa]')
 plt.axis('scaled')
 
@@ -171,5 +174,3 @@ plt.contour(Xp, Yp, PSI,50,colors='k',linestyle='-')
 plt.contour(Xp, Yp, PSIf,50,colors='b',linestyle='--')
 plt.title('Streamlines')
 plt.axis('scaled')
-
-

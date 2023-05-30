@@ -108,7 +108,7 @@ title 'Fluid pressure [Pa]';
 axis square
 
 subplot 143
-contourf(Xc,Yc,reshape(p-ps,Grid.p.Ny,Grid.p.Nx),100);
+contourf(Xc,Yc,reshape(p + rho_s * grav * Yc(:),Grid.p.Ny,Grid.p.Nx),100);
 c2 = colorbar;
 xlabel('x','fontsize',14)
 ylabel('z','fontsize',14)
