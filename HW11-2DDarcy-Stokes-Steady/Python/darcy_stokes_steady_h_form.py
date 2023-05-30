@@ -60,11 +60,11 @@ rho_f  = 1e3 #Density of fluid [kg/m^3]
 Gamma  = 0   #Rate of melting [kg/m^3-s]
 grav   = 9.81#Acceleration due to gravity []m/s^2]
 Delta_rho = rho_f - rho_s #Density difference between the two phases [kg/m^3]
-vt     = 1e-5#Tangential velocity [m/s]
+vt     = 1e-3#Tangential velocity [m/s]
 
 #building grid
-Gridp.xmin = 0.0 ; Gridp.xmax = 1 ; Gridp.Nx   = 4
-Gridp.ymin = 0.0 ; Gridp.ymax = 1 ; Gridp.Ny   = 4
+Gridp.xmin = 0.0 ; Gridp.xmax = 1 ; Gridp.Nx   = 5
+Gridp.ymin = 0.0 ; Gridp.ymax = 1 ; Gridp.Ny   = 5
 Gridp.geom = 'cartesian'
 Grid = build_stokes_grid(Gridp)
 [Xc,Yc] = np.meshgrid(Gridp.xc,Gridp.yc)
