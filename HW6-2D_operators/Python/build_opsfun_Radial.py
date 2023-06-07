@@ -34,8 +34,9 @@ def build_ops(Grid):
         Dx = sp.spdiags(([-e , e])/np.asarray(Grid.dx),np.array([0,Ny]),N,(Nx+1)*Ny).tocsr()#.toarray() # 2D div-matrix in x-dir
 
         #D  = np.concatenate((Dx , Dy), axis=1)
-        D  = sp.hstack([Dx , Dy])    
-        dof_f_bnd = np.concatenate(np.array([Grid.dof_f_xmin-1, Grid.dof_f_xmax-1, Grid.dof_f_ymin-1, Grid.dof_f_ymax-1]), axis=0)       # boundary faces
+        D  = sp.hstack([Dx , Dy]) 
+        
+        dof_f_bnd = np.concatenate((Grid.dof_f_xmin-1, Grid.dof_f_xmax-1, Grid.dof_f_ymin-1, Grid.dof_f_ymax-1))       # boundary faces
         dof_f_bnd = np.transpose(dof_f_bnd)
         
     elif (Nx > 1) and (Ny == 1): #one dimensional in x direction
