@@ -3,6 +3,7 @@ import numpy as np
 #import matplotlib.pyplot as plt
 import scipy.sparse as sp
 import scipy.sparse.linalg as linalg
+from scikits.umfpack import spsolve, splu
 
 # import personal libraries
 #import build_gridfun

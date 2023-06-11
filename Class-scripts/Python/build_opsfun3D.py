@@ -40,7 +40,7 @@ def build_ops3D(Grid):
     # Note this is only true in cartesian coordinates!
     # For more general coordinate systems it is worth
     # assembling G and D seperately.
-    dof_f_bnd = np.concatenate(np.array([Grid.dof_f_xmin-1, Grid.dof_f_xmax-1, Grid.dof_f_ymin-1, Grid.dof_f_ymax-1,Grid.dof_f_zmin-1, Grid.dof_f_zmax-1]), axis=0 )# boundary faces
+    dof_f_bnd = np.concatenate([Grid.dof_f_xmin-1, Grid.dof_f_xmax-1, Grid.dof_f_ymin-1, Grid.dof_f_ymax-1,Grid.dof_f_zmin-1, Grid.dof_f_zmax-1])# boundary faces
     dof_f_bnd = np.transpose(dof_f_bnd)
     
     

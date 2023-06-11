@@ -3,7 +3,10 @@ import numpy as np
 #import matplotlib.pyplot as plt
 import scipy.sparse as sp
 import scipy.sparse.linalg as linalg
-
+from scipy.linalg import solve as fullspsolve
+import time
+import matplotlib.pyplot as plt
+from scikits.umfpack import spsolve, splu
 # import personal libraries
 #import build_gridfun
 #import build_opsfun
@@ -37,15 +40,59 @@ def solve_lbvp(L,f,B,g,N):
     # Output:
     # u = column vector of the solution of size N by 1
     if B.nnz == 0:
-        u  = np.transpose([linalg.cg(L, f)[0]])
+        u = linalg.spsolve(L, f)
     else:
+        tp1 = time.perf_counter()
+        up = np.transpose([sp.csr_matrix.transpose(B) @ linalg.spsolve((B @ sp.csr_matrix.transpose(B)),g)])
+        tp2 = time.perf_counter()
         
-        up = sp.csr_matrix.transpose(B) @ np.transpose([linalg.cg((B @ sp.csr_matrix.transpose(B)),g)[0]])
-        u0 = np.transpose([N @ np.transpose([linalg.cg(sp.csr_matrix.transpose(N) @ L @ N,sp.csr_matrix.transpose(N) @ (f-L @ up))[0]])])
+        th1 = time.perf_counter() 
+        
+        tN1=time.perf_counter()
+        Nnew= sp.csr_matrix.transpose(N) @ L @ N
+        tN2=time.perf_counter()
+        
+        trhs1=time.perf_counter()
+        rhs = sp.csr_matrix.transpose(N) @ (f-L @ up)
+        trhs2=time.perf_counter()
 
+        '''
+        tu0r1np=time.perf_counter() 
+        print(sp.issparse(Nnew.toarray()))
+        u0r = fullspsolve(Nnew.toarray(),rhs)
+        tu0r2np=time.perf_counter() 
+        ''' 
+        
+        tu0r1umft=time.perf_counter() 
+        print(sp.issparse(Nnew))
+        u0r = spsolve(Nnew,rhs)
+        tu0r2umft=time.perf_counter() 
+        
+        th2 = time.perf_counter()  
+
+        tu0r1=time.perf_counter() 
+        plt.spy(Nnew)
+        print(sp.issparse(Nnew))
+        linalg.use_solver(useUmfpack=True) # enforce superLU over UMFPACK
+        u0r = linalg.spsolve(Nnew,rhs)
+        tu0r2=time.perf_counter() 
+       
+        u0 = np.transpose([N @ u0r])
+        th2 = time.perf_counter()  
+        
+        print('Time to calculate particular solution', tp2 - tp1)       
+        
+        print('Time to calculate new N', tN2 - tN1) 
+        print('Time to calculate new rhs', trhs2 - trhs1) 
+        #print('Time to calculate reduced homogeneous solution solve', tu0r2np - tu0r1np)
+        print('Time to calculate reduced homogeneous solution umft spsolve', tu0r2umft - tu0r1umft)
+        print('Time to calculate reduced homogeneous solution scipy spsolve', tu0r2 - tu0r1)
+        print('Time to calculate homogeneous solution', th2 - th1)
         u = u0 + up
 
     return u;
+
+
 '''
 class grid:
     def __init__(self):

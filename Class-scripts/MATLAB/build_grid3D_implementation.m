@@ -6,7 +6,7 @@
 set_demo_defaults;
 
 %building grid and operators
-Grid.xmin = 0; Grid.xmax = 3; Grid.Nx = 50;
+Grid.xmin = 0; Grid.xmax = 3; Grid.Nx = 100;
 Grid.ymin = 0; Grid.ymax = 3; Grid.Ny = 50;
 Grid.zmin = 0; Grid.zmax = 3; Grid.Nz = 50;
 
