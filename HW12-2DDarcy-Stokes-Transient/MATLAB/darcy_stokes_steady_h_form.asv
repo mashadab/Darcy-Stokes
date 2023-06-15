@@ -36,6 +36,10 @@ phi= phi_min * ones(Grid.p.N,1);%+ (phi_max - phi_min)*(Yc(:)/Grid.p.ymax);  %De
 fs = build_RHS(phi,Kd,Grid.p,Mp,Dp,rho_f,rho_s,Gamma,grav);
 
 %% Build operators for porosity evolution
+fs = ;  
+IM_phi = I;
+EX_phi = @(A) I + A
+fs_theta = @(v) -Gamma/rho_s*ones(Grid.N,1)     %Melting term RHS and 
 
 
 %% Build BC's
@@ -56,9 +60,9 @@ BC.g       = [vt*ones(length(Grid.dof_ymax_vt(2:end-1)),1);...       % tangentia
 [B,N,fn] = build_bnd(BC,Grid,I);
 
 %Transport equation: Porosity
-BC..dof_dir   = [];
-BC.dof_f_dir = [];         
-BC.g         = [];                         % pressure constraint
+BC.phi.dof_dir   = [];
+BC.phi.dof_f_dir = [];         
+BC.phi.g         = [];                      % pressure constraint
 [B,N,fn] = build_bnd(BC,Grid,I);
 
 for i = 1:5
@@ -78,9 +82,11 @@ for i = 1:5
     u = solve_lbvp(L,fs+fn,B,BC.g,N);
     v = u(1:Grid.p.Nf); h = u(Grid.p.Nf+1:end); %Solid velocity and overpressure head
     PSI = comp_streamfun(v,Grid.p);             %Solid velocity stream function
-
     
     %Solving for ice-mass balance / porosity evolution
+    A_phi = flux_upwind(v,Grid);  %Calculating the advection matrix
+    L_phi = - Dp * A_phi;         %Advection operator
+    
 end
 
 
