@@ -2,6 +2,8 @@
 %Author: Mohammad Afzal Shadab
 %Date: May 29, 2023
 
+set(groot, 'DefaultFigureVisible', 'on');
+
 %Parameters
 mu_max = 1e14; %Maximum solid viscosity [Pa.s]
 phi_min= 0.2; phi_max= 0.7; %Minimum and Maximum solid porosities [-]

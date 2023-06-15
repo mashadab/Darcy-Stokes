@@ -35,30 +35,30 @@ if ((Nx>1) && (Ny==1)) || ((Nx==1) && (Ny>1)) % 1D
         A(Grid.N+1,1) = min(q(Grid.N+1),0);
     end
 elseif (Nx>1) && (Ny>1) % 2D    
-    %% Readable implementation with kron
-    % x-matrices
-    Iy = speye(Ny);
-    Axp1 = spdiags(ones(Nx,1),-1,Nx+1,Nx);  % 1D x-poititve
-    Axn1 = spdiags(ones(Nx,1),0,Nx+1,Nx);   % 1D x-negative
-    Axp = kron(Axp1,Iy);                    % 2D x-positive
-    Axn = kron(Axn1,Iy);                    % 2D x-negative
-    
-    % y-matrices
-    Ix = speye(Nx);
-    Ayp1 = spdiags(ones(Ny,1),-1,Ny+1,Ny);  % 1D y-positive
-    Ayn1 = spdiags(ones(Ny,1),0,Ny+1,Ny);   % 1D y-negative
-    Ayp = kron(Ix,Ayp1);                    % 2D y-positive
-    Ayn = kron(Ix,Ayn1);                    % 2D y-negative
-    
-    % Positive and Negative Matrices
-    Ap = [Axp; Ayp];
-    An = [Axn; Ayn];
-    
-    % Diagonal Flux Matrices
-    Qp = spdiags(max(q,0),0,Nf,Nf);
-    Qn = spdiags(min(q,0),0,Nf,Nf);
-    
-    A = Qp*Ap + Qn*An;
+% % %     %% Readable implementation with kron
+% % %     % x-matrices
+% % %     Iy = speye(Ny);
+% % %     Axp1 = spdiags(ones(Nx,1),-1,Nx+1,Nx);  % 1D x-poititve
+% % %     Axn1 = spdiags(ones(Nx,1),0,Nx+1,Nx);   % 1D x-negative
+% % %     Axp = kron(Axp1,Iy);                    % 2D x-positive
+% % %     Axn = kron(Axn1,Iy);                    % 2D x-negative
+% % %     
+% % %     % y-matrices
+% % %     Ix = speye(Nx);
+% % %     Ayp1 = spdiags(ones(Ny,1),-1,Ny+1,Ny);  % 1D y-positive
+% % %     Ayn1 = spdiags(ones(Ny,1),0,Ny+1,Ny);   % 1D y-negative
+% % %     Ayp = kron(Ix,Ayp1);                    % 2D y-positive
+% % %     Ayn = kron(Ix,Ayn1);                    % 2D y-negative
+% % %     
+% % %     % Positive and Negative Matrices
+% % %     Ap = [Axp; Ayp];
+% % %     An = [Axn; Ayn];
+% % %     
+% % %     % Diagonal Flux Matrices
+% % %     Qp = spdiags(max(q,0),0,Nf,Nf);
+% % %     Qn = spdiags(min(q,0),0,Nf,Nf);
+% % %     
+% % %     A = Qp*Ap + Qn*An;
    
     %{
     %% Compact implementation with kron

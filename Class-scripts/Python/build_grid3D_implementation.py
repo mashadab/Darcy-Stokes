@@ -23,7 +23,7 @@ import scipy.sparse as sp
 #Solving the numerical problem
 #################################################################################
 
-Grid.xmin = 0; Grid.xmax = 3; Grid.Nx = 100
+Grid.xmin = 0; Grid.xmax = 3; Grid.Nx = 50
 Grid.ymin = 0; Grid.ymax = 3; Grid.Ny = 50
 Grid.zmin = 0; Grid.zmax = 3; Grid.Nz = 50
 
