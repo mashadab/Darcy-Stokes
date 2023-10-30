@@ -1,4 +1,5 @@
-# Europa-Darcy-Stokes
+# Darcy-Stokes
+## Melt migration in convecting ice shell with differential motion
 
 This repository has a 1D/2D/3D conservative finite difference solver using Discrete Operator approach. It was developed during my thesis research and also as a part of Marc's class "GEO 325M/398M Numerical Modeling in the Geosciences". (https://mhesse.github.io/numerical_modeling/)
 
