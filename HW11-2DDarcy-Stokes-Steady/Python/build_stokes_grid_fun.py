@@ -69,6 +69,9 @@ def build_stokes_grid(Gridp):
     
     # Pressure constraint in center of domain
     Grid.dof_pc = np.array([Grid.p.Nf+round(Grid.p.N/2)])
+
+    # Pressure constraint in the first cell
+    Grid.dof_pc_comp_col = np.array([Grid.p.Nf+1])
     
     # Common useful BC's
     # Penetration - set normal velocities on all boundaries to zero

@@ -62,13 +62,45 @@ grav   = 9.81#Acceleration due to gravity []m/s^2]
 Delta_rho = rho_f - rho_s #Density difference between the two phases [kg/m^3]
 vt     = 1e-3#Tangential velocity [m/s]
 
+#Compaction length
+phic = phi_min
+delta0 = np.sqrt(k0*phic**n*mu_max/(phic**m*mu_f))
+Kc = k0*Delta_rho*grav*phic**n/mu_f
+
 #building grid
-Gridp.xmin = 0.0 ; Gridp.xmax = 1 ; Gridp.Nx   = 500
-Gridp.ymin = 0.0 ; Gridp.ymax = 1 ; Gridp.Ny   = 500
+Gridp.xmin = 0.0*delta0 ; Gridp.xmax = 0.1*delta0; Gridp.Nx   = 5
+Gridp.ymin = 0.0*delta0 ; Gridp.ymax = 0.1*delta0; Gridp.Ny   = 100
 Gridp.geom = 'cartesian'
 Grid = build_stokes_grid(Gridp)
 [Xc,Yc] = np.meshgrid(Gridp.xc,Gridp.yc)
 Xc_col = np.reshape(Xc.T,(Gridp.N,-1)); Yc_col = np.reshape(Yc.T,(Gridp.N,-1))
+
+#Analytic solution
+HD = Grid.p.ymax/delta0
+zDa = np.linspace(0,HD,num=1000)
+##############################################################################
+#Analytic solutions
+##############################################################################
+class analytical:
+    #dimensionless fluid overpressure head
+    hD = lambda zD,HD: zD + (np.exp(-HD) - 1)/(np.exp(HD) - np.exp(-HD))* np.exp( zD) + \
+                            (np.exp( HD) - 1)/(np.exp(HD) - np.exp(-HD))* np.exp(-zD)
+                            
+    #dimensionless relative volumetric flux of fluid w.r.t. solid velocity: qD = - d hD/ dzD 
+    qD = lambda zD,HD: -1 - (np.exp(-HD) - 1)/(np.exp(HD) - np.exp(-HD))* np.exp( zD) + \
+                            (np.exp( HD) - 1)/(np.exp(HD) - np.exp(-HD))* np.exp(-zD)
+                            
+    #dimensionless fluid pressure pD = hD - zD
+    pD = lambda zD,HD: (np.exp(-HD) - 1)/(np.exp(HD) - np.exp(-HD))* np.exp( zD) + \
+                       (np.exp( HD) - 1)/(np.exp(HD) - np.exp(-HD))* np.exp(-zD)
+    
+    #dimensionless solid velocity potential, setting c4 = 0
+    uD = lambda zD,HD: -zD - (np.exp(-HD) - 1)/(np.exp(HD) - np.exp(-HD))* np.exp( zD) - \
+                             (np.exp( HD) - 1)/(np.exp(HD) - np.exp(-HD))* np.exp(-zD)
+    
+    #dimensionless solid velocity vD = - d uD/d zD 
+    vD = lambda zD,HD:  1  + (np.exp(-HD) - 1)/(np.exp(HD) - np.exp(-HD))* np.exp( zD) - \
+                             (np.exp( HD) - 1)/(np.exp(HD) - np.exp(-HD))* np.exp(-zD)
 
 #Initial condition
 mu = mu_max  * np.ones_like(Yc_col)  #Constt viscosity
@@ -76,8 +108,8 @@ phi= phi_min * np.ones((Grid.p.N,1)) #+ (phi_max - phi_min)*(Yc(:)/Grid.p.ymax);
 
 
 #simulation name
-simulation_type = 'no_flow' #'lid_driven_cavity_flow_with_no_slip'   #lid_driven_cavity_flow_with_slip or 'no_flow' 
-simulation_name = f'stokes_solver_test{simulation_type}_domain{Gridp.xmax-Gridp.xmin}by{Gridp.ymax-Gridp.ymin}_N{Gridp.Nx}by{Gridp.Ny}'
+simulation_type = 'inst_comp_column' #'lid_driven_cavity_flow_with_no_slip'   #lid_driven_cavity_flow_with_slip or 'no_flow' 
+simulation_name = f'{simulation_type}_domain{Gridp.xmax-Gridp.xmin}by{Gridp.ymax-Gridp.ymin}_N{Gridp.Nx}by{Gridp.Ny}'
 
 #building operators
 D, Edot, Dp, Gp, I, Ms, Mp = build_stokes_ops_Darcy_Stokes(Grid)
@@ -91,7 +123,6 @@ L  = bmat([[A + Gp @ Zd @ Dp, -(Delta_rho * grav)* Gp], [Dp, -(Delta_rho * grav)
 fs = build_RHS(phi,Kd,Grid.p,Mp,Dp,rho_f,rho_s,Gamma,grav)
 
 
-
 #Boundary conditions
 if 'lid_driven_cavity_flow_with_slip' in simulation_type:
     BC.dof_dir =  np.concatenate((Grid.dof_pene, \
@@ -99,7 +130,16 @@ if 'lid_driven_cavity_flow_with_slip' in simulation_type:
                                   Grid.dof_pc))
     BC.g = np.transpose([np.concatenate((np.zeros(Grid.N_pene), \
                                          vt*np.ones(len(Grid.dof_ymax_vt)),\
-                                        [0.0]))])
+                                         [0.0] ))])
+elif 'inst_comp_column' in simulation_type:
+    BC.dof_dir =  np.concatenate((Grid.dof_pene, \
+                                  Grid.dof_ymax_vt[1:-1],\
+                                  Grid.dof_ymin_vt[1:-1],\
+                                  np.array([Grid.p.Nf+1])))
+    BC.g = np.transpose([np.concatenate((np.zeros(Grid.N_pene), \
+                                         np.zeros(len(Grid.dof_ymax_vt[1:-1])),\
+                                         np.zeros(len(Grid.dof_ymin_vt[1:-1])),\
+                                         np.array([analytical.hD(Grid.p.dy/(2*delta0),HD)*delta0])))])
     
 elif 'lid_driven_cavity_flow_with_no_slip' in simulation_type: #did not work
     BC.dof_dir =  np.concatenate((Grid.dof_pene, \
@@ -140,64 +180,23 @@ vf = v - spdiags((1./(Mp @ phi)).T,0,Grid.p.Nf,Grid.p.Nf) @ Kd @ (Gp @ h)
 [PSIf,psif_min,psif_max] = comp_streamfun(vf,Gridp) #Fluid velocity stream function
 
 #Plotting
-#quiver_plot(simulation_name,Grid,v)
-plot_streamlines(simulation_name,Grid,v,PSI,psi_min,psi_max,'label_no')
+fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(15,7))
+fig.suptitle(f'Dim-less depth = {HD}, Porosity = {phic}')
 
+ax1.plot(h[0:Grid.p.Ny],Grid.p.yc,'k.',label=r'Numerical')
+ax1.plot(analytical.hD(zDa,HD)*delta0,zDa*delta0,'r-',label=r'Analytical')
+ax1.set_ylabel('$z$ [m]')
+ax1.set_xlabel('$h$ [m]')
+ax1.legend(loc = 'best')
 
-plt.figure()
-plt.contourf(Xc,Yc,np.transpose((mu).reshape(Gridp.Nx,Gridp.Ny)))
-plt.colorbar()
+ax2.plot(p[0:Grid.p.Ny],Grid.p.yc,'k.',label=r'N')
+ax2.plot(analytical.pD(zDa,HD)*Delta_rho*grav*delta0,zDa*delta0,'r-',label=r'A')
+ax2.set_xlabel('Overpressure [Pa]')
 
-#plt.figure(figsize=(20,10),sharex=True,sharey=True)
-plt.subplots(1, 4, figsize=(20,4), sharex=True,sharey=True)
-ax1 = plt.subplot(1, 4, 1)
-plt.contourf(Xc,Yc,np.transpose((mu).reshape(Gridp.Nx,Gridp.Ny)),100)
-plt.title('Porosity')
-plt.colorbar()
-plt.axis('scaled')
+ax3.plot(v[Grid.p.Nfx:Grid.p.Nfx+Grid.p.Ny],Grid.p.yc,'k.',label=r'N')
+ax3.plot(analytical.vD(zDa,HD)*Kc,zDa*delta0,'r-',label=r'A')
+ax3.set_xlabel('Solid velocity [m/s]')
 
-ax2 = plt.subplot(1, 4, 2)
-plt.contourf(Xc,Yc,np.transpose((pf).reshape(Gridp.Nx,Gridp.Ny)),100)
-plt.colorbar()
-plt.contour(Xc,Yc,np.transpose((pf).reshape(Gridp.Nx,Gridp.Ny)),50,colors='k')
-plt.title('Fluid Pressure [Pa]')
-plt.axis('scaled')
+plt.tight_layout()
+plt.savefig(f"instant_comp_column_phic{phic}_HD{HD}.pdf")
 
-ax3 = plt.subplot(1, 4, 3)
-plt.contourf(Xc,Yc,np.transpose((p).reshape(Gridp.Nx,Gridp.Ny)),100)
-plt.colorbar()
-plt.contour(Xc,Yc,np.transpose((p).reshape(Gridp.Nx,Gridp.Ny)),50,colors='k')
-plt.title('Overpressure [Pa]')
-plt.axis('scaled')
-
-ax4 = plt.subplot(1, 4, 4)
-Xp,Yp = np.meshgrid(Grid.Vx.xc,Grid.Vy.yc)
-plt.contour(Xp, Yp, PSI,50,colors='k',linestyle='-')
-plt.contour(Xp, Yp, PSIf,50,colors='b',linestyle='--')
-plt.title('Streamlines')
-plt.axis('scaled')
-
-
-
-
-plt.figure()
-plt.contourf(Xc,Yc,np.transpose((mu).reshape(Gridp.Nx,Gridp.Ny)))
-plt.colorbar()
-
-#plt.figure(figsize=(20,10),sharex=True,sharey=True)
-plt.subplots(1, 2, figsize=(10,4), sharex=True,sharey=True)
-ax1 = plt.subplot(1, 2, 1)
-plt.plot(Gridp.xc,v[Grid.p.dof_f_ymin-1],'r-')
-plt.plot(Gridp.xc,v[Grid.p.dof_f_ymax-1],'b--')
-plt.plot(Gridp.yc,v[Grid.p.dof_f_xmin-1],'k.')
-plt.plot(Gridp.yc,v[Grid.p.dof_f_xmax-1],'g-.')
-plt.title('Solid velocity [m/s]')
-#plt.axis('scaled')
-
-ax2 = plt.subplot(1, 2, 2)
-plt.plot(Gridp.xc,vf[Grid.p.dof_f_ymin-1],'r-')
-plt.plot(Gridp.xc,vf[Grid.p.dof_f_ymax-1],'b--')
-plt.plot(Gridp.yc,vf[Grid.p.dof_f_xmin-1],'k.')
-plt.plot(Gridp.yc,vf[Grid.p.dof_f_xmax-1],'g-.')
-plt.title('Fluid velocity [m/s]')
-#plt.axis('scaled')
