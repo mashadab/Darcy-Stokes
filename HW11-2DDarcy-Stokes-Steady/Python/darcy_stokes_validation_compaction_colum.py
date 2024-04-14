@@ -49,7 +49,7 @@ def build_RHS(phi,Kd,Grid,Mp,Dp,rho_f,rho_s,Gamma,grav):
 
 #problem parameter
 mu_max = 1e14 #Maximum solid viscosity [Pa.s]
-phi_min= 0.2; phi_max= 0.7 #Minimum and Maximum solid porosities [-]
+phi_min= 1e-2; phi_max= 0.7 #Minimum and Maximum solid porosities [-]
 G      = 1.0 #Coefficient in the bulk viscosity formulation [-]
 k0     = 5.6e-11 #Relative permeability [m^2] {Meyer and Hewitt, 2017}
 mu_f   = 1e-3#Viscosity of the fluid [Pa.s]
@@ -68,8 +68,8 @@ delta0 = np.sqrt(k0*phic**n*mu_max/(phic**m*mu_f))
 Kc = k0*Delta_rho*grav*phic**n/mu_f
 
 #building grid
-Gridp.xmin = 0.0*delta0 ; Gridp.xmax = 0.1*delta0; Gridp.Nx   = 5
-Gridp.ymin = 0.0*delta0 ; Gridp.ymax = 0.1*delta0; Gridp.Ny   = 100
+Gridp.xmin = 0.0*delta0 ; Gridp.xmax = 1*delta0; Gridp.Nx   = 5
+Gridp.ymin = 0.0*delta0 ; Gridp.ymax = 1*delta0; Gridp.Ny   = 100
 Gridp.geom = 'cartesian'
 Grid = build_stokes_grid(Gridp)
 [Xc,Yc] = np.meshgrid(Gridp.xc,Gridp.yc)
