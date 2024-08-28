@@ -11,7 +11,7 @@ set(groot, 'DefaultFigureVisible', 'on');
 
 %Parameters
 mu_max = 1e14; %Maximum solid viscosity [Pa.s]
-phi_min= 1e-2; phi_max= 0.7; %Minimum and Maximum solid porosities [-]
+phi_min= 1e-3; phi_max= 0.7; %Minimum and Maximum solid porosities [-]
 G      = 1.0; %Coefficient in the bulk viscosity formulation [-]
 k0     = 5.6e-11; %Relative permeability [m^2] {Meyer and Hewitt, 2017}
 mu_f   = 1e-3;%Viscosity of the fluid [Pa.s]

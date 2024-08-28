@@ -58,6 +58,9 @@ Grid.dof_ymax_p = Grid.p.Nf+Grid.p.dof_ymax;
 % Pressure constraint in center of domain
 Grid.dof_pc = Grid.p.Nf+round(Grid.p.N/2);
 
+% Pressure constraint in the first cell
+Grid.dof_pc_comp_col = Grid.p.Nf+1;
+
 
 %% Common useful BC's
 % Penetration - set normal velocities on all boundaries to zero
@@ -71,4 +74,3 @@ Grid.N_slip = length(Grid.dof_slip);
 % Solid boundary - no slip and no penetration
 Grid.dof_solid_bnd = unique([Grid.dof_pene;Grid.dof_slip]);
 Grid.N_solid_bnd = length(Grid.dof_solid_bnd);
-
