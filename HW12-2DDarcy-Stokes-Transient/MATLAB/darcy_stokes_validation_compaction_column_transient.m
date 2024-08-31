@@ -15,7 +15,7 @@ set(groot, 'DefaultFigureVisible', 'off');
 %Parameters
 yr2s   = 365.25 * 24 * 60 * 60; %year to second conversion [s/year]
 mu_max = 1e14; %Maximum solid viscosity [Pa.s]
-phi_min= 1e-1; phi_max= 0.7; %Minimum and Maximum solid porosities [-]
+phi_min= 1e-3; phi_max= 0.7; %Minimum and Maximum solid porosities [-]
 G      = 1.0; %Coefficient in the bulk viscosity formulation [-]
 k0     = 5.6e-11; %Relative permeability [m^2] {Meyer and Hewitt, 2017}
 mu_f   = 1e-3;%Viscosity of the fluid [Pa.s]
@@ -30,7 +30,7 @@ vt     = 0;   %Tangential velocity [m/s]
 
 %Transient
 Nt     = 2000;  %Number of time steps
-tf     = 200*yr2s;%Final time [s]
+tf     = 500*yr2s;%Final time [s]
 dt     = tf/Nt; %Time step [s]
 
 %Characteristic scales
