@@ -5,6 +5,15 @@ clc
 close all 
 clear all
 
+% Colors Marc likes - or at least used to like
+col.red    = [190  30  45]/255; 
+col.blue   = [ 39 170 225]/255; 
+col.green  = [  0 166  81]/255;
+col.orange = [247 148  30]/255;
+col.purple = [102  45 145]/255;
+col.brown  = [117  76  36]/255;
+col.tan    = [199 178 153]/255;
+
 set(groot,'defaultAxesFontName','Times')
 set(groot,'defaultAxesFontSize',20)
 set(groot,'defaulttextinterpreter','latex')
@@ -37,6 +46,8 @@ dt     = tf/Nt; %Time step [s]
 phic = phi_min
 delta0 = sqrt(k0*phic^n*mu_max/(phic^m*mu_f)) %Compaction length
 Kc = k0*Delta_rho*grav*phic^n/mu_f %Compaction hydraulic conductivity
+w0 = Kc/phic      %Characterstic fluid segregation velocity 
+
 
 %% Build staggered grids
 Gridp.xmin = 0*delta0; Gridp.xmax = 10*delta0; Gridp.Nx = 5;
@@ -352,3 +363,23 @@ function F = build_RHS(phi,Kd,Grid,Mp,Dp,rho_f,rho_s,Gamma,grav)
     
     F = [fv;fp];
 end
+
+Yc_max_arr = [];
+
+for i = 1:size(phi_array,1)
+    phi_iter = phi_array(i,:);
+    phi_iter = reshape(phi_iter,Grid.p.Ny,Grid.p.Nx);
+    phi_iter(Yc<1000) = 0; %zeroing out the basal increase in porosity ie below 1km
+    Yc_max = Yc(find(phi_iter==max(phi_iter)));
+    Yc_max = max(Yc_max)
+    Yc_max_arr = [Yc_max_arr;Yc_max];
+end
+
+figure()
+plot(tTot_array/yr2s,Yc_max_arr,'r-',color=col.red,linewidth=3)
+hold on
+phi_iter = phi_array(1,:)
+
+plot(tTot_array/yr2s,Yc_col(find(phi_iter==max(phi_array(1,:))))-tTot_array*5*w0,color=col.blue,linewidth=3)
+legend('Simulated', 'Theoretical',location='best')
+saveas(gcf,'porosity-wave_1e-3.pdf')
