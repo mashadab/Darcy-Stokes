@@ -342,6 +342,28 @@ close(writerObj);
     hist(v(1,Grid.p.Nfx+1:Grid.p.Nfx+1+Grid.p.Ny),100)
 
 
+Yc_max_arr = [];
+
+for i = 1:size(phi_array,1)
+    phi_iter = phi_array(i,:);
+    phi_iter = reshape(phi_iter,Grid.p.Ny,Grid.p.Nx);
+    phi_iter(Yc<1000) = 0; %zeroing out the basal increase in porosity ie below 1km
+    Yc_max = Yc(find(phi_iter==max(phi_iter)));
+    Yc_max = max(Yc_max)
+    Yc_max_arr = [Yc_max_arr;Yc_max];
+end
+
+figure()
+plot(tTot_array/yr2s,Yc_max_arr,'r-',color=col.red,linewidth=3)
+hold on
+phi_iter = phi_array(1,:)
+phi_iter = reshape(phi_iter,Grid.p.Ny,Grid.p.Nx);
+plot(tTot_array/yr2s,Yc(find(phi_iter==max(phi_array(1,:))))-tTot_array*5*w0,color=col.blue,linewidth=3)
+legend('Simulated', 'Theoretical',location='best')
+ylabel('Elevation [m]')
+xlabel('Time [yrs]')
+saveas(gcf,'porosity-wave_1e-3.pdf')
+
 
 function Zd = build_Zd(G,phi,m,mu,Grid) %building zeta^*_phi at cell centers
     Zd = (G ./ (phi.^m) - 2/3) .* mu .* (1-phi);
@@ -363,23 +385,3 @@ function F = build_RHS(phi,Kd,Grid,Mp,Dp,rho_f,rho_s,Gamma,grav)
     
     F = [fv;fp];
 end
-
-Yc_max_arr = [];
-
-for i = 1:size(phi_array,1)
-    phi_iter = phi_array(i,:);
-    phi_iter = reshape(phi_iter,Grid.p.Ny,Grid.p.Nx);
-    phi_iter(Yc<1000) = 0; %zeroing out the basal increase in porosity ie below 1km
-    Yc_max = Yc(find(phi_iter==max(phi_iter)));
-    Yc_max = max(Yc_max)
-    Yc_max_arr = [Yc_max_arr;Yc_max];
-end
-
-figure()
-plot(tTot_array/yr2s,Yc_max_arr,'r-',color=col.red,linewidth=3)
-hold on
-phi_iter = phi_array(1,:)
-
-plot(tTot_array/yr2s,Yc_col(find(phi_iter==max(phi_array(1,:))))-tTot_array*5*w0,color=col.blue,linewidth=3)
-legend('Simulated', 'Theoretical',location='best')
-saveas(gcf,'porosity-wave_1e-3.pdf')
