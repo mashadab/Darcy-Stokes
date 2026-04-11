@@ -1,10 +1,10 @@
 import numpy as np
-import matplotlib.pyplot as plt
     
 def mean(x):
     x = np.ravel(x)
     y = np.r_[x[0], (x[:-1] + x[1:]) / 2, x[-1]].reshape(-1,1)
     return y
+
 
 def build_grid(Grid):
     # Author: Mohammad Afzal Shadab
@@ -72,6 +72,8 @@ def build_grid(Grid):
     
     #Set up mesh for plotting
     #xcoords of the cell centers    
+    #Grid.xc = [Grid.xmin+Grid.dx/2:Grid.dx:Grid.xmax-Grid.dx/2] # x-coords of gridblock centers
+    #temp = [xmin+xi*Grid.dx + Grid.dx/2 for xi in range(Grid.Nx)]
     Grid.xc = np.transpose(np.linspace(Grid.xmin+Grid.dx/2, Grid.xmax-Grid.dx/2, Grid.Nx))
     Grid.yc = np.transpose(np.linspace(Grid.ymin+Grid.dy/2, Grid.ymax-Grid.dy/2, Grid.Ny))
 
@@ -169,7 +171,7 @@ def build_grid_unstructured(Grid):
         Grid.Lx = Grid.xmax-Grid.xmin    # domain length in x
         Grid.dx = Grid.Lx/Grid.Nx        # dx of the gridblocks
         #scaling the grid
-        Grid.Lx = Grid.Lx*np.sum(Grid.scale_x)
+        Grid.Lx = Grid.dx*np.sum(Grid.scale_x)
         Grid.xmax = Grid.xmin + Grid.Lx
         Grid.dx_scaled = Grid.dx*Grid.scale_x
         Grid.dxf_scaled=  mean(Grid.dx_scaled)
@@ -199,7 +201,7 @@ def build_grid_unstructured(Grid):
         Grid.Ly = Grid.ymax-Grid.ymin    # domain length in y
         Grid.dy = Grid.Ly/Grid.Ny        # dy of the gridblocks
         #scaling the grid
-        Grid.Ly   = Grid.Ly*np.sum(Grid.scale_y)
+        Grid.Ly   = Grid.dy*np.sum(Grid.scale_y)
         Grid.ymax = Grid.ymin + Grid.Ly
         Grid.dy_scaled = Grid.dy*Grid.scale_y
         Grid.dyf_scaled=  mean(Grid.dy_scaled)
@@ -252,120 +254,6 @@ def build_grid_unstructured(Grid):
     Grid.dof_f_ymin = np.transpose(DOFy[0,:])
     Grid.dof_f_ymax = np.transpose(DOFy[Grid.Ny+1-1,:])
     #Grid.A  = np.concatenate([np.ones((Grid.Nfx,1))*Grid.dy,np.ones((Grid.Nfy,1))*Grid.dx,[[Grid.dx*Grid.dy]]], axis=0 )
-    Grid.A  = np.concatenate([np.kron(np.ones((Grid.Nx+1,1)),Grid.dy_scaled),np.kron(Grid.dyf_scaled,np.ones((Grid.Ny+1,1))),[[Grid.Lx*Grid.Ly]]], axis=0 )
+    Grid.A  = np.concatenate([np.kron(np.ones((Grid.Nx+1,1)),Grid.dy_scaled),np.kron(Grid.dxf_scaled,np.ones((Grid.Ny+1,1))),[[Grid.Lx*Grid.Ly]]], axis=0 )
     Grid.V  = np.kron(Grid.dx_scaled,Grid.dy_scaled)#np.ones((Grid.N,1))*Grid.dx*Grid.dy    
     return Grid;
-
-'''def plot_grid_unstructured(Grid, ms_center=20, ms_xface=30, ms_yface=30, lw=0.8):
-    # cell boundary coordinates
-    Xv, Yv = np.meshgrid(Grid.xf.ravel(), Grid.yf.ravel())
-
-    fig, ax = plt.subplots()
-
-    # draw all grid lines
-    for j in range(Grid.Ny + 1):   # horizontal lines
-        ax.plot(Xv[j, :], Yv[j, :], 'k-', lw=lw)
-
-    for i in range(Grid.Nx + 1):   # vertical lines
-        ax.plot(Xv[:, i], Yv[:, i], 'k-', lw=lw)
-
-    # cell centers
-    Xc, Yc = np.meshgrid(Grid.xc.ravel(), Grid.yc.ravel())
-    ax.scatter(Xc, Yc, marker='o', s=ms_center, facecolors='none', edgecolors='b', label='cell centers')
-
-    # x-face centers
-    Xx, Yx = np.meshgrid(Grid.xf.ravel(), Grid.yc.ravel())
-    ax.scatter(Xx, Yx, marker='x', s=ms_xface, c='r', label='x-face centers')
-
-    # y-face centers
-    Xy, Yy = np.meshgrid(Grid.xc.ravel(), Grid.yf.ravel())
-    ax.scatter(Xy, Yy, marker='^', s=ms_yface, facecolors='none', edgecolors='g', label='y-face centers')
-
-    ax.set_aspect('equal')
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-    ax.legend()
-    plt.show()'''
-    
-
-def plot_grid_unstructured(Grid, ms_center=50, ms_xface=50, ms_yface=50, lw=0.8):
-
-    import numpy as np
-    import matplotlib.pyplot as plt
-    from matplotlib import rcParams
-    rcParams.update({'font.size': 22})
-    rcParams.update({'font.family': 'Times'})
-    dx_off = 0.01 * (Grid.xf.max() - Grid.xf.min())
-    dy_off = 0.01 * (Grid.yf.max() - Grid.yf.min())
-
-    Xv, Yv = np.meshgrid(Grid.xf.ravel(), Grid.yf.ravel())
-    fig, ax = plt.subplots(figsize=(8,10),dpi=120)
-
-    for j in range(Grid.Ny + 1):
-        ax.plot(Xv[j, :], Yv[j, :], 'k-', lw=lw)
-    for i in range(Grid.Nx + 1):
-        ax.plot(Xv[:, i], Yv[:, i], 'k-', lw=lw)
-
-    # -------- cell centers --------
-    Xc, Yc = np.meshgrid(Grid.xc.ravel(), Grid.yc.ravel())
-    ax.scatter(Xc, Yc, marker='o', s=ms_center,
-               facecolors='none', edgecolors='b', label='cell centers')
-
-    Xc_flat = Xc.T.reshape(-1)
-    Yc_flat = Yc.T.reshape(-1)
-
-    for k in range(Grid.N):
-        ax.text(Xc_flat[k] + dx_off, Yc_flat[k] + dy_off,
-                f'{Grid.dof[k]}',  color='b')
-
-    # -------- x-faces --------
-    Xx, Yx = np.meshgrid(Grid.xf.ravel(), Grid.yc.ravel())
-    ax.scatter(Xx, Yx, marker='x', s=ms_xface, c='r', label='x-face centers')
-
-    Xx_flat = Xx.T.reshape(-1)
-    Yx_flat = Yx.T.reshape(-1)
-
-    for k in range(Grid.Nfx):
-        ax.text(Xx_flat[k] + dx_off, Yx_flat[k] + dy_off,
-                f'{Grid.dof_f[k]}', color='r')
-
-    # -------- y-faces --------
-    Xy, Yy = np.meshgrid(Grid.xc.ravel(), Grid.yf.ravel())
-    ax.scatter(Xy, Yy, marker='^', s=ms_yface,
-               facecolors='none', edgecolors='g', label='y-face centers')
-
-    Xy_flat = Xy.T.reshape(-1)
-    Yy_flat = Yy.T.reshape(-1)
-
-    for k in range(Grid.Nfy):
-        ax.text(Xy_flat[k] + dx_off, Yy_flat[k] + dy_off,
-                f'{Grid.dof_f[Grid.Nfx + k]}', color='g')
-
-    ax.set_aspect('equal')
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-    ax.legend(frameon=False)
-    plt.show()
-
-
-class Grid:
-    def __init__(self):
-        self.xmin = []
-        self.xmax = []
-        self.Nx   = []
-
-
-Grid.xmin = 0; Grid.xmax = 1; Grid.Nx = 4; Grid.scale_x = np.transpose([np.linspace(1,4,4)])
-Grid.ymin = 0; Grid.ymax = 1; Grid.Ny = 3; Grid.scale_y = np.transpose([np.linspace(1,3,3)])
-
-#plot grid structured
-Grid = build_grid(Grid)
-plot_grid_unstructured(Grid)
-print(Grid.V)
-print(Grid.A)
-#plot grid unstructured
-Grid = build_grid_unstructured(Grid)
-plot_grid_unstructured(Grid)
-print(Grid.V)
-print(Grid.A)
-
